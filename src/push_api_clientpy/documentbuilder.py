@@ -24,7 +24,7 @@ class DocumentBuilder:
         self.document.Date = self.__validateDateAndReturnValidDate(date)
         return self
 
-    def withModifiedDateDate(self, date: Union[str, int, datetime]):
+    def withModifiedDate(self, date: Union[str, int, datetime]):
         self.document.ModifiedDate = self.__validateDateAndReturnValidDate(date)
         return self
 
