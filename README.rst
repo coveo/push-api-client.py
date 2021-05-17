@@ -3,13 +3,13 @@ push-api-client.py
 ==================
 
 
-Add a short description here!
+Python Push API Client
 
 
 Description
 ===========
 
-A longer description of your project goes here...
+Work in progress
 
 
 .. _pyscaffold-notes:
