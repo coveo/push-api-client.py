@@ -2,7 +2,7 @@
 push-api-client.py
 ==================
 
-This is the documentation of **push-api-client.py**.
+This is the documentation of **coveo-push-api-client.py**.
 
 .. note::
 

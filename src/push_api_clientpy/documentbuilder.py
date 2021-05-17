@@ -7,3 +7,5 @@ class DocumentBuilder:
         self.document = Document()
         self.document.uri = documentId
         self.document.title = documentTitle
+
+    

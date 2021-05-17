@@ -93,7 +93,7 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = "push-api-client.py"
+project = "coveo-push-api-client.py"
 copyright = "2021, Olivier Lamothe"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -228,7 +228,7 @@ html_static_path = ["_static"]
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "push-api-client.py-doc"
+htmlhelp_basename = "coveo-push-api-client.py-doc"
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -245,7 +245,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ("index", "user_guide.tex", "push-api-client.py Documentation", "Olivier Lamothe", "manual")
+    ("index", "user_guide.tex", "coveo-push-api-client.py Documentation", "Olivier Lamothe", "manual")
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

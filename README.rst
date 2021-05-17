@@ -1,5 +1,5 @@
 ==================
-push-api-client.py
+coveo-push-api-client.py
 ==================
 
 
