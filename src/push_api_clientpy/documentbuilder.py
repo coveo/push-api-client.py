@@ -53,6 +53,8 @@ class DocumentBuilder:
 
     def withMetadataValue(self, key: str, value: MetadataValue):
         self.__validateReservedKeynames(key)
+        if hasattr(self.document, 'Metadata') is False:
+            self.document.Metadata = dict()
         self.document.Metadata[key] = value
         return self
 
@@ -97,6 +99,9 @@ class DocumentBuilder:
             out["data"] = self.document.Data
         if hasattr(self.document, 'FileExtension'):
             out["fileExtension"] = self.document.FileExtension
+        if hasattr(self.document, 'Metadata'):
+            for k in self.document.Metadata:
+                out[k] = self.document.Metadata[k]
 
         return json.dumps(out)
 
