@@ -1,6 +1,8 @@
 from enum import Enum
 from typing import Union
 
+MetadataValue = Union[str, list[str], int, list[int], float, list[float]]
+
 class CompressionType(Enum):
     UNCOMPRESSED = 'UNCOMPRESSED'
     DEFLATE = 'DEFLATE'
@@ -42,7 +44,7 @@ class Document:
     ParentID: str
     Data: str
     CompressedBinaryData: CompressedBinaryData
-    Metadata: dict[str, Union[str, list[str], int, list[int], float, list[float]]]
+    Metadata: dict[str, MetadataValue]
     Permissions: Permission
     FileExtension: str
 
