@@ -117,8 +117,7 @@ class DocumentBuilder:
             dateAsDatetime = cast(datetime, date)
 
         if type(dateAsDatetime) is not datetime:
-            raise Exception(
-                Error(self, "Unable to convert date to valid datetime", date))
+            raise Error(self, "Unable to convert date to valid datetime", date)
 
         return dateAsDatetime.isoformat()
 
