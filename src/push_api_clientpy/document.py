@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import Union
+from .platformclient import SecurityIdentityType
 
 MetadataValue = Union[str, list[str], int, list[int], float, list[float]]
 
@@ -9,13 +10,6 @@ class CompressionType(Enum):
     GZIP = 'GZIP'
     LZMA = 'LZMA'
     ZLIB = 'ZLIB'
-
-
-class SecurityIdentityType(Enum):
-    UNKNOWN = 'UNKNOWN'
-    USER = 'USER'
-    GROUP = 'GROUP'
-    VIRTUAL_GROUP = 'VIRTUAL_GROUP'
 
 
 class SecurityIdentity:
