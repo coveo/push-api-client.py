@@ -10,46 +10,47 @@ from .document import CompressedBinaryData, CompressionType, Document, MetadataV
 class Error(Exception):
     pass
 
+
 class DocumentBuilder:
 
     def __init__(self, documentId: str, documentTitle: str):
-        self.document = Document(Uri=documentId, Title=documentTitle)
+        self.document = Document(documentId, documentTitle)
 
     def withData(self, data: str):
-        self.document.Data = data
+        self.document.data = data
         return self
 
     def withDate(self, date: Union[str, int, datetime]):
-        self.document.Date = self.__validateDateAndReturnValidDate(date)
+        self.document.date = self.__validateDateAndReturnValidDate(date)
         return self
 
     def withModifiedDate(self, date: Union[str, int, datetime]):
-        self.document.ModifiedDate = self.__validateDateAndReturnValidDate(date)
+        self.document.modifiedDate = self.__validateDateAndReturnValidDate(date)
         return self
 
     def withPermanentId(self, permanentId: str):
-        self.document.PermanentID = permanentId
+        self.document.permanentId = permanentId
         return self
 
     def withFileExtension(self, extension: str):
         self.__validateFileExtension(extension)
-        self.document.FileExtension = extension
+        self.document.fileExtension = extension
         return self
 
     def withParentId(self, parentId: str):
-        self.document.ParentID = parentId
+        self.document.parentId = parentId
         return self
 
     def withClickableUri(self, clickURI: str):
-        self.document.ClickableUri = clickURI
+        self.document.clickableUri = clickURI
         return self
 
     def withMetadataValue(self, key: str, value: MetadataValue):
         self.__validateReservedKeynames(key)
         print(self.document)
-        if self.document.Metadata is None:
-            self.document.Metadata = dict()
-        self.document.Metadata[key] = value
+        if self.document.metadata is None:
+            self.document.metadata = dict()
+        self.document.metadata[key] = value
         return self
 
     def withMetadata(self, metadata: dict[str,  MetadataValue]):
@@ -66,17 +67,29 @@ class DocumentBuilder:
         return self
 
     def withAllowAnonymousUsers(self, allowAnonymous: bool):
-        if self.document.Permissions is None:
-            self.document.Permissions = Permission()
-        self.document.Permissions.AllowAnonymous = allowAnonymous
+        if self.document.permissions is None:
+            self.document.permissions = [Permission()]
+        self.document.permissions[0].allowAnonymous = allowAnonymous
         return self
 
     def marshal(self):
         # TODO global validation + fill missing
         # TODO marshal binary data
         # TODO marshal permissions
+        return self.__cleanDocument()
 
-        return asdict(self.document)
+    def __cleanDocument(self):
+        withoutEmptyValue = {k: v for k, v in asdict(
+            self.document).items() if v is not None and v != ""}
+
+        for k, v in self.document.metadata.items():
+            withoutEmptyValue[k] = v
+        del withoutEmptyValue['metadata']
+
+        withoutEmptyValue['documentId'] = self.document.uri
+        del withoutEmptyValue['uri']
+
+        return withoutEmptyValue
 
     def __validateDateAndReturnValidDate(self, date: Union[str, int, datetime]) -> str:
         dateAsDatetime = datetime.now()

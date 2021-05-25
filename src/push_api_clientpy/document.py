@@ -8,34 +8,41 @@ CompressionType = Literal["UNCOMPRESSED", "DEFLATE", "GZIP", "LZMA", "ZLIB"]
 
 @dataclass
 class SecurityIdentity:
-    Identity: str
-    IdentityType: SecurityIdentityType
-    SecurityProvider: str
+    identity: str
+    identityType: SecurityIdentityType
+    securityProvider: str
 
 
 @dataclass
 class Permission:
-    AllowedPermissions: list[SecurityIdentity] = field(init=False)
-    DeniedPermissions: list[SecurityIdentity] = field(init=False)
-    AllowAnonymous: bool = field(init=False, default=True)
+    allowedPermissions: list[SecurityIdentity] = field(init=False, default_factory=list)
+    deniedPermissions: list[SecurityIdentity] = field(init=False, default_factory=list)
+    allowAnonymous: bool = field(init=False, default=True)
 
 
 @dataclass
 class CompressedBinaryData:
-    CompressionType: CompressionType
-    Data: str
+    compressionType: CompressionType
+    data: str
+
 
 @dataclass
 class Document:
-    Uri: str
-    Title: str
-    ClickableUri: Optional[str] = field(init=False)
-    Author: Optional[str] = field(init=False)
-    Date: Optional[str] = field(init=False)
-    ModifiedDate: Optional[str] = field(init=False)
-    PermanentID: Optional[str] = field(init=False)
-    ParentID: Optional[str] = field(init=False)
-    Data: Optional[str] = field(init=False)
-    Metadata: Optional[dict[str, MetadataValue]] = field(init=False)
-    Permissions: Optional[Permission] = field(init=False)
-    FileExtension: Optional[str] = field(init=False)
+    uri: str
+    title: str
+    clickableUri: Optional[str] = field(init=False, default="")
+    author: Optional[str] = field(init=False, default="")
+    date: Optional[str] = field(init=False, default="")
+    modifiedDate: Optional[str] = field(init=False, default="")
+    permanentId: Optional[str] = field(init=False, default="")
+    parentId: Optional[str] = field(init=False, default="")
+    data: Optional[str] = field(init=False, default="")
+    metadata: Optional[dict[str, MetadataValue]] = field(init=False)
+    permissions: Optional[list[Permission]] = field(init=False)
+    fileExtension: Optional[str] = field(init=False, default="")
+
+    def __init__(self, uri, title) -> None:
+        self.metadata = {}
+        self.permissions = [Permission()]
+        self.uri = uri
+        self.title = title
