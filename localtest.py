@@ -9,7 +9,7 @@ source = Source(apikey=dotenv_values().get("API_KEY"),
                 organizationid=dotenv_values().get("ORG_ID"))
 
 addDoc = source.addOrUpdateDocument(dotenv_values().get("SOURCE_ID"), docBuilder)
-print(addDoc.status_code, addDoc.json())
+print(addDoc.status_code, addDoc.json(), docBuilder.marshal())
 
 createSourceResponse = source.create('testlocalpython', "SECURED")
 print(createSourceResponse.status_code, createSourceResponse.json())

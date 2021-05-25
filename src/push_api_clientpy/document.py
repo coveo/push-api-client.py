@@ -37,12 +37,8 @@ class Document:
     permanentId: Optional[str] = field(init=False, default="")
     parentId: Optional[str] = field(init=False, default="")
     data: Optional[str] = field(init=False, default="")
-    metadata: Optional[dict[str, MetadataValue]] = field(init=False)
-    permissions: Optional[list[Permission]] = field(init=False)
+    metadata: Optional[dict[str, MetadataValue]] = field(init=False, default_factory=dict)
+    permissions: Optional[list[Permission]] = field(init=False, default_factory=lambda: [Permission()])
     fileExtension: Optional[str] = field(init=False, default="")
 
-    def __init__(self, uri, title) -> None:
-        self.metadata = {}
-        self.permissions = [Permission()]
-        self.uri = uri
-        self.title = title
+
