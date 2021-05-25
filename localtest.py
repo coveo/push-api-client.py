@@ -3,12 +3,17 @@ from src.push_api_clientpy import DocumentBuilder, Source, SecurityIdentityModel
 import datetime
 from dotenv import dotenv_values
 
-docBuilder = DocumentBuilder('id', 'title')
-print(docBuilder.withClickableUri)
+docBuilder = DocumentBuilder('id', 'title')\
+    .withDate(datetime.datetime.now())\
+    .withModifiedDate("2000/01/01")\
+    .withClickableUri('https://clicky.uri')\
+    .withFileExtension('.html')\
+    .withParentId('parent_id')\
+    .withMetadata({"foo": "bar", "bar": ["buzz"]})\
+    .withMetadataValue("hello", [1, 2, 3])
 
-#print(docBuilder.marshal())
+print(docBuilder.marshal())
 
-"""
 source = Source(apikey=dotenv_values().get("API_KEY"),
                 organizationid=dotenv_values().get("ORG_ID"))
 
@@ -53,5 +58,3 @@ deleteIdentityResponse = source.deleteSecurityIdentity(
     delete
 )
 print(deleteIdentityResponse.status_code, deleteIdentityResponse.json())
-
-"""

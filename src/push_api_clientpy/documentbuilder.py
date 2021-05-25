@@ -46,6 +46,7 @@ class DocumentBuilder:
 
     def withMetadataValue(self, key: str, value: MetadataValue):
         self.__validateReservedKeynames(key)
+        print(self.document)
         if self.document.Metadata is None:
             self.document.Metadata = dict()
         self.document.Metadata[key] = value
