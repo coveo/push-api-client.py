@@ -1,20 +1,19 @@
 import base64
+from dataclasses import asdict
 import json
 from datetime import datetime
 from typing import Union, cast
 from dateutil.parser import parse
-from .document import CompressionType, Document, MetadataValue
+from .document import CompressedBinaryData, CompressionType, Document, MetadataValue, Permission
 
 
 class Error(Exception):
     pass
 
-
 class DocumentBuilder:
-    document: Document
 
     def __init__(self, documentId: str, documentTitle: str):
-        self.document = Document(documentId, documentTitle)
+        self.document = Document(Uri=documentId, Title=documentTitle)
 
     def withData(self, data: str):
         self.document.Data = data
@@ -32,12 +31,6 @@ class DocumentBuilder:
         self.document.PermanentID = permanentId
         return self
 
-    def withCompressedBinaryData(self, data: str, compressionType: CompressionType):
-        self.__validateCompressedBinaryData(data)
-        self.document.CompressedBinaryData.Data = data
-        self.document.CompressedBinaryData.CompressionType = compressionType
-        return self
-
     def withFileExtension(self, extension: str):
         self.__validateFileExtension(extension)
         self.document.FileExtension = extension
@@ -53,7 +46,7 @@ class DocumentBuilder:
 
     def withMetadataValue(self, key: str, value: MetadataValue):
         self.__validateReservedKeynames(key)
-        if hasattr(self.document, 'Metadata') is False:
+        if self.document.Metadata is None:
             self.document.Metadata = dict()
         self.document.Metadata[key] = value
         return self
@@ -72,6 +65,8 @@ class DocumentBuilder:
         return self
 
     def withAllowAnonymousUsers(self, allowAnonymous: bool):
+        if self.document.Permissions is None:
+            self.document.Permissions = Permission()
         self.document.Permissions.AllowAnonymous = allowAnonymous
         return self
 
@@ -80,30 +75,7 @@ class DocumentBuilder:
         # TODO marshal binary data
         # TODO marshal permissions
 
-        out = dict()
-        out["documentId"] = self.document.Uri
-        out["title"] = self.document.Title
-        if hasattr(self.document, 'ClickableUri'):
-            out["clickableUri"] = self.document.ClickableUri
-        if hasattr(self.document, 'Author'):
-            out["author"] = self.document.Author
-        if hasattr(self.document, 'Date'):
-            out["date"] = self.document.Date
-        if hasattr(self.document, 'ModifiedDate'):
-            out["modifiedDate"] = self.document.ModifiedDate
-        if hasattr(self.document, 'PermanentID'):
-            out["permanentId"] = self.document.PermanentID
-        if hasattr(self.document, 'ParentID'):
-            out["parentId"] = self.document.ParentID
-        if hasattr(self.document, 'Data'):
-            out["data"] = self.document.Data
-        if hasattr(self.document, 'FileExtension'):
-            out["fileExtension"] = self.document.FileExtension
-        if hasattr(self.document, 'Metadata'):
-            for k in self.document.Metadata:
-                out[k] = self.document.Metadata[k]
-
-        return json.dumps(out)
+        return asdict(self.document)
 
     def __validateDateAndReturnValidDate(self, date: Union[str, int, datetime]) -> str:
         dateAsDatetime = datetime.now()

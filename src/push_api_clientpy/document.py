@@ -1,47 +1,41 @@
-from enum import Enum
-from typing import Union
+from dataclasses import dataclass, field
+from typing import Literal, Optional, Union
 from .platformclient import SecurityIdentityType
 
 MetadataValue = Union[str, list[str], int, list[int], float, list[float]]
-
-class CompressionType(Enum):
-    UNCOMPRESSED = 'UNCOMPRESSED'
-    DEFLATE = 'DEFLATE'
-    GZIP = 'GZIP'
-    LZMA = 'LZMA'
-    ZLIB = 'ZLIB'
+CompressionType = Literal["UNCOMPRESSED", "DEFLATE", "GZIP", "LZMA", "ZLIB"]
 
 
+@dataclass
 class SecurityIdentity:
     Identity: str
     IdentityType: SecurityIdentityType
     SecurityProvider: str
 
-class Permission: 
-    AllowAnonymous: bool
-    AllowedPermissions: list[SecurityIdentity]
-    DeniedPermissions: list[SecurityIdentity]
 
+@dataclass
+class Permission:
+    AllowedPermissions: list[SecurityIdentity] = field(init=False)
+    DeniedPermissions: list[SecurityIdentity] = field(init=False)
+    AllowAnonymous: bool = field(init=False, default=True)
+
+
+@dataclass
 class CompressedBinaryData:
     CompressionType: CompressionType
     Data: str
 
-
+@dataclass
 class Document:
     Uri: str
     Title: str
-    ClickableUri: str
-    Author: str
-    Date: str
-    ModifiedDate: str
-    PermanentID: str
-    ParentID: str
-    Data: str
-    CompressedBinaryData: CompressedBinaryData
-    Metadata: dict[str, MetadataValue]
-    Permissions: Permission
-    FileExtension: str
-
-    def __init__(self, id: str, title: str): 
-        self.Uri = id
-        self.Title = title
+    ClickableUri: Optional[str] = field(init=False)
+    Author: Optional[str] = field(init=False)
+    Date: Optional[str] = field(init=False)
+    ModifiedDate: Optional[str] = field(init=False)
+    PermanentID: Optional[str] = field(init=False)
+    ParentID: Optional[str] = field(init=False)
+    Data: Optional[str] = field(init=False)
+    Metadata: Optional[dict[str, MetadataValue]] = field(init=False)
+    Permissions: Optional[Permission] = field(init=False)
+    FileExtension: Optional[str] = field(init=False)

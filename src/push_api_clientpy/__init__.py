@@ -15,7 +15,8 @@ except PackageNotFoundError:  # pragma: no cover
 finally:
     del version, PackageNotFoundError
 
+from .platformclient import *
 from .document import *
 from .documentbuilder import *
 from .source import *
-from .platformclient import *
+
