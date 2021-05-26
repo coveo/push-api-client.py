@@ -19,3 +19,4 @@ from .document import *
 from .documentbuilder import *
 from .source import *
 from .platformclient import *
+from .securityidentitybuilder import *

@@ -1,10 +1,12 @@
 import base64
 from dataclasses import asdict
-import json
 from datetime import datetime
 from typing import Union, cast
+
 from dateutil.parser import parse
-from .document import CompressedBinaryData, CompressionType, Document, MetadataValue, Permission
+
+from .document import Document, MetadataValue, SecurityIdentity
+from .securityidentitybuilder import SecurityIdentityBuilder
 
 
 class Error(Exception):
@@ -55,12 +57,12 @@ class DocumentBuilder:
             self.withMetadataValue(key, metadata[key])
         return self
 
-    def withAllowedPermissions(self):
-        # TODO
+    def withAllowedPermissions(self, allowed: SecurityIdentityBuilder):
+        self.__setPermissions(allowed, self.document.permissions[0].allowedPermissions)
         return self
 
-    def withDeniedPermissions(self):
-        # TODO
+    def withDeniedPermissions(self, denied: SecurityIdentityBuilder):
+        self.__setPermissions(denied, self.document.permissions[0].deniedPermissions)
         return self
 
     def withAllowAnonymousUsers(self, allowAnonymous: bool):
@@ -70,7 +72,6 @@ class DocumentBuilder:
     def marshal(self):
         # TODO global validation + fill missing
         # TODO marshal binary data
-        # TODO marshal permissions
         return self.__cleanDocument()
 
     def __cleanDocument(self):
@@ -125,3 +126,10 @@ class DocumentBuilder:
             if keyName == reserved:
                 raise Error(
                     self, f'Cannot use ${keyName} as a metadata key: It is a reserved key name. See https://docs.coveo.com/en/78/index-content/push-api-reference#json-document-reserved-key-names')
+
+    def __setPermissions(self, securityIdentityBuilder: SecurityIdentityBuilder, permissionSection: list[SecurityIdentity]):
+        identities = securityIdentityBuilder.build()
+        if type(identities) is list:
+            permissionSection.extend(identities)
+        else:
+            permissionSection.append(identities)
