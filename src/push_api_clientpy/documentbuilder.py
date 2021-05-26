@@ -47,9 +47,6 @@ class DocumentBuilder:
 
     def withMetadataValue(self, key: str, value: MetadataValue):
         self.__validateReservedKeynames(key)
-        print(self.document)
-        if self.document.metadata is None:
-            self.document.metadata = dict()
         self.document.metadata[key] = value
         return self
 
@@ -67,8 +64,6 @@ class DocumentBuilder:
         return self
 
     def withAllowAnonymousUsers(self, allowAnonymous: bool):
-        if self.document.permissions is None:
-            self.document.permissions = [Permission()]
         self.document.permissions[0].allowAnonymous = allowAnonymous
         return self
 
