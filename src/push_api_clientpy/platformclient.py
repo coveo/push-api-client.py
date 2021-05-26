@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Literal
 import requests
+import json
 
 SourceVisibility = Literal["PRIVATE", "SECURED", "SHARED"]
 SecurityIdentityType = Literal["USER", "GROUP", "VIRTUAL_GROUP", "UNKNOWN"]
@@ -85,7 +86,6 @@ class SecurityIdentityBatchConfig:
 
 
 class PlatformClient:
-
     def __init__(self, apikey: str, organizationid: str):
         self.apikey = apikey
         self.organizationid = organizationid
@@ -129,6 +129,12 @@ class PlatformClient:
         queryParams = {"fileId": batchConfig.FileID,
                        "orderingId": batchConfig.OrderingID}
         return requests.delete(url, params=queryParams, headers=headers)
+
+    def pushDocument(self, sourceId: str, doc):
+        headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
+        url = f'{self.__basePushURL()}/sources/{sourceId}/documents'
+        queryParams = {"documentId": doc["documentId"]}
+        return requests.put(url, headers=headers, data=json.dumps(doc), params=queryParams)
 
     def __basePushURL(self):
         return f'https://api.cloud.coveo.com/push/v1/organizations/{self.organizationid}'

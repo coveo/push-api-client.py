@@ -1,5 +1,5 @@
 from .platformclient import PlatformClient, SecurityIdentityAliasModel, SecurityIdentityBatchConfig, SecurityIdentityDelete, SecurityIdentityDeleteOptions, SecurityIdentityModel, SourceVisibility
-
+from .documentbuilder import DocumentBuilder
 
 class Source:
     def __init__(self, apikey: str, organizationid: str):
@@ -22,3 +22,6 @@ class Source:
 
     def manageSecurityIdentities(self, securityProviderId: str, batchConfig: SecurityIdentityBatchConfig):
         return self.client.manageSecurityIdentities(securityProviderId, batchConfig)
+
+    def addOrUpdateDocument(self, sourceId: str, docBuilder: DocumentBuilder):
+        return self.client.pushDocument(sourceId, docBuilder.marshal())

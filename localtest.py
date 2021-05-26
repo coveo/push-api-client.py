@@ -3,19 +3,13 @@ from src.push_api_clientpy import DocumentBuilder, Source, SecurityIdentityModel
 import datetime
 from dotenv import dotenv_values
 
-docBuilder = DocumentBuilder('id', 'title')\
-    .withDate(datetime.datetime.now())\
-    .withModifiedDate("2000/01/01")\
-    .withClickableUri('https://clicky.uri')\
-    .withFileExtension('.html')\
-    .withParentId('parent_id')\
-    .withMetadata({"foo": "bar", "bar": ["buzz"]})\
-    .withMetadataValue("hello", [1, 2, 3])
-
-print(docBuilder.marshal())
+docBuilder = DocumentBuilder('https://perdu.com', 'title')
 
 source = Source(apikey=dotenv_values().get("API_KEY"),
                 organizationid=dotenv_values().get("ORG_ID"))
+
+addDoc = source.addOrUpdateDocument(dotenv_values().get("SOURCE_ID"), docBuilder)
+print(addDoc.status_code, addDoc.json(), docBuilder.marshal())
 
 createSourceResponse = source.create('testlocalpython', "SECURED")
 print(createSourceResponse.status_code, createSourceResponse.json())
@@ -58,4 +52,3 @@ deleteIdentityResponse = source.deleteSecurityIdentity(
     delete
 )
 print(deleteIdentityResponse.status_code, deleteIdentityResponse.json())
-

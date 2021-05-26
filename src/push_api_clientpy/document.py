@@ -1,47 +1,44 @@
-from enum import Enum
-from typing import Union
+from dataclasses import dataclass, field
+from typing import Literal, Optional, Union
 from .platformclient import SecurityIdentityType
 
 MetadataValue = Union[str, list[str], int, list[int], float, list[float]]
-
-class CompressionType(Enum):
-    UNCOMPRESSED = 'UNCOMPRESSED'
-    DEFLATE = 'DEFLATE'
-    GZIP = 'GZIP'
-    LZMA = 'LZMA'
-    ZLIB = 'ZLIB'
+CompressionType = Literal["UNCOMPRESSED", "DEFLATE", "GZIP", "LZMA", "ZLIB"]
 
 
+@dataclass
 class SecurityIdentity:
-    Identity: str
-    IdentityType: SecurityIdentityType
-    SecurityProvider: str
+    identity: str
+    identityType: SecurityIdentityType
+    securityProvider: str
 
-class Permission: 
-    AllowAnonymous: bool
-    AllowedPermissions: list[SecurityIdentity]
-    DeniedPermissions: list[SecurityIdentity]
 
+@dataclass
+class Permission:
+    allowedPermissions: list[SecurityIdentity] = field(init=False, default_factory=list)
+    deniedPermissions: list[SecurityIdentity] = field(init=False, default_factory=list)
+    allowAnonymous: bool = field(init=False, default=True)
+
+
+@dataclass
 class CompressedBinaryData:
-    CompressionType: CompressionType
-    Data: str
+    compressionType: CompressionType
+    data: str
 
 
+@dataclass
 class Document:
-    Uri: str
-    Title: str
-    ClickableUri: str
-    Author: str
-    Date: str
-    ModifiedDate: str
-    PermanentID: str
-    ParentID: str
-    Data: str
-    CompressedBinaryData: CompressedBinaryData
-    Metadata: dict[str, MetadataValue]
-    Permissions: Permission
-    FileExtension: str
+    uri: str
+    title: str
+    clickableUri: Optional[str] = field(init=False, default="")
+    author: Optional[str] = field(init=False, default="")
+    date: Optional[str] = field(init=False, default="")
+    modifiedDate: Optional[str] = field(init=False, default="")
+    permanentId: Optional[str] = field(init=False, default="")
+    parentId: Optional[str] = field(init=False, default="")
+    data: Optional[str] = field(init=False, default="")
+    metadata: Optional[dict[str, MetadataValue]] = field(init=False, default_factory=dict)
+    permissions: Optional[list[Permission]] = field(init=False, default_factory=lambda: [Permission()])
+    fileExtension: Optional[str] = field(init=False, default="")
 
-    def __init__(self, id: str, title: str): 
-        self.Uri = id
-        self.Title = title
+
