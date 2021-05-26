@@ -38,7 +38,7 @@ class GroupSecurityIdentityBuilder(SecurityIdentityBuilder):
 
     def build(self):
         if type(self.group) is list:
-            return list(map(lambda identity: AnySecurityIdentityBuilder(identity, "GROUP", self.securityProvider).build(), self.group))
+            return list(map(lambda group: AnySecurityIdentityBuilder(group, "GROUP", self.securityProvider).build(), self.group))
 
         return AnySecurityIdentityBuilder(self.group, "GROUP", self.securityProvider).build()
 
@@ -50,6 +50,6 @@ class VirtualGroupSecurityIdentityBuilder(SecurityIdentityBuilder):
 
     def build(self):
         if type(self.virtualGroup) is list:
-            return list(map(lambda identity: AnySecurityIdentityBuilder(identity, "VIRTUAL_GROUP", self.securityProvider).build(), self.virtualGroup))
+            return list(map(lambda virtualGroup: AnySecurityIdentityBuilder(virtualGroup, "VIRTUAL_GROUP", self.securityProvider).build(), self.virtualGroup))
 
         return AnySecurityIdentityBuilder(self.virtualGroup, "VIRTUAL_GROUP", self.securityProvider).build()
