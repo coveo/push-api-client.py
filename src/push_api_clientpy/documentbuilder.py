@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 from typing import Union, cast
 from dateutil.parser import parse
-from .document import CompressedBinaryData, CompressionType, Document, MetadataValue, Permission
+from .document import Document, MetadataValue
 
 
 class Error(Exception):
