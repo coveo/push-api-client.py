@@ -2,7 +2,7 @@ import base64
 from dataclasses import asdict
 from datetime import datetime
 from typing import Union, cast
-
+import hashlib
 from dateutil.parser import parse
 
 from .document import Document, MetadataValue, SecurityIdentity
@@ -72,6 +72,8 @@ class DocumentBuilder:
     def marshal(self):
         # TODO global validation + fill missing
         # TODO marshal binary data
+        if self.document.permanentId == "":
+            self.__generatePermanentId()
         return self.__cleanDocument()
 
     def __cleanDocument(self):
@@ -86,6 +88,10 @@ class DocumentBuilder:
         del withoutEmptyValue['uri']
 
         return withoutEmptyValue
+
+    def __generatePermanentId(self):
+        self.document.permanentId = hashlib.sha256(
+            self.document.uri.encode('utf-8')).hexdigest()
 
     def __validateDateAndReturnValidDate(self, date: Union[str, int, datetime]) -> str:
         dateAsDatetime = datetime.now()
