@@ -21,8 +21,8 @@ class Permission:
 
 @dataclass
 class CompressedBinaryData:
-    compressionType: CompressionType
-    data: str
+    compressionType: CompressionType = field(default="UNCOMPRESSED")
+    data: str = field(default="")
 
 
 @dataclass
@@ -39,5 +39,6 @@ class Document:
     metadata: Optional[dict[str, MetadataValue]] = field(init=False, default_factory=dict)
     permissions: Optional[list[Permission]] = field(init=False, default_factory=lambda: [Permission()])
     fileExtension: Optional[str] = field(init=False, default="")
+    compressedBinaryData: Optional[CompressedBinaryData] = field(init=False, default_factory=lambda: CompressedBinaryData())
 
 

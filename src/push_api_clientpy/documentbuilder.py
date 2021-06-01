@@ -5,7 +5,7 @@ from typing import Union, cast
 import hashlib
 from dateutil.parser import parse
 
-from .document import Document, MetadataValue, SecurityIdentity
+from .document import CompressionType, Document, MetadataValue, SecurityIdentity
 from .securityidentitybuilder import SecurityIdentityBuilder
 
 
@@ -21,6 +21,11 @@ class DocumentBuilder:
     def withData(self, data: str):
         self.document.data = data
         return self
+
+    def withCompressedBinaryData(self, data: str, compressionType: CompressionType):
+        self.document.compressedBinaryData.compressionType = compressionType
+        self.document.compressedBinaryData.data = data
+        return self        
 
     def withDate(self, date: Union[str, int, datetime]):
         self.document.date = self.__validateDateAndReturnValidDate(date)
@@ -70,6 +75,7 @@ class DocumentBuilder:
         return self
 
     def marshal(self):
+        self.__validateDataAndBinaryData()
         # TODO global validation + fill missing
         # TODO marshal binary data
         if self.document.permanentId == "":
@@ -86,6 +92,12 @@ class DocumentBuilder:
 
         withoutEmptyValue['documentId'] = self.document.uri
         del withoutEmptyValue['uri']
+
+        if self.document.compressedBinaryData.data != "":
+            withoutEmptyValue['compressedBinaryData'] = self.document.compressedBinaryData.data
+            withoutEmptyValue['compressionType'] = self.document.compressedBinaryData.compressionType
+        else:
+            del withoutEmptyValue['compressedBinaryData']
 
         return withoutEmptyValue
 
@@ -108,12 +120,6 @@ class DocumentBuilder:
             raise Error(self, "Unable to convert date to valid datetime", date)
 
         return dateAsDatetime.isoformat()
-
-    def __validateCompressedBinaryData(self, data: str):
-        isBase64 = base64.b64encode(base64.b64decode(data)) == data
-        if not isBase64:
-            raise Error(
-                self, "Invalid compressedBinaryData: When using compressedBinaryData, the data must be base64 encoded.")
 
     def __validateFileExtension(self, ext: str):
         if ext[0] != ".":
@@ -139,3 +145,7 @@ class DocumentBuilder:
             permissionSection.extend(identities)
         else:
             permissionSection.append(identities)
+
+    def __validateDataAndBinaryData(self):
+        if self.document.data != "" and self.document.compressedBinaryData.data != "":
+            raise Error(self, 'Cannot set both data and binary data on the same document')
