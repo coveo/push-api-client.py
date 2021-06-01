@@ -1,10 +1,9 @@
 from dataclasses import dataclass, field
 from typing import Literal, Optional, Union
-from .platformclient import SecurityIdentityType
 
 MetadataValue = Union[str, list[str], int, list[int], float, list[float]]
 CompressionType = Literal["UNCOMPRESSED", "DEFLATE", "GZIP", "LZMA", "ZLIB"]
-
+SecurityIdentityType = Literal["USER", "GROUP", "VIRTUAL_GROUP", "UNKNOWN"]
 
 @dataclass
 class SecurityIdentity:

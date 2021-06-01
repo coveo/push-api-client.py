@@ -1,10 +1,10 @@
-from dataclasses import dataclass
-from typing import Literal
+from .document import Document, SecurityIdentityType
+from dataclasses import asdict, dataclass
+from typing import Literal, TypedDict
 import requests
 import json
 
 SourceVisibility = Literal["PRIVATE", "SECURED", "SHARED"]
-SecurityIdentityType = Literal["USER", "GROUP", "VIRTUAL_GROUP", "UNKNOWN"]
 
 
 @dataclass
@@ -85,6 +85,23 @@ class SecurityIdentityBatchConfig:
     OrderingID: int
 
 
+@dataclass
+class FileContainer:
+    uploadUri: str
+    fileId: str
+    requiredHeaders: dict[str, str]
+
+@dataclass
+class BatchDelete:
+    documentId: str
+    deleteChildren: bool
+
+@dataclass
+class BatchUpdateDocuments:
+    addOrUpdate: list[Document]
+    delete: list[BatchDelete]
+
+
 class PlatformClient:
     def __init__(self, apikey: str, organizationid: str):
         self.apikey = apikey
@@ -135,6 +152,22 @@ class PlatformClient:
         url = f'{self.__basePushURL()}/sources/{sourceId}/documents'
         queryParams = {"documentId": doc["documentId"]}
         return requests.put(url, headers=headers, data=json.dumps(doc), params=queryParams)
+
+    def createFileContainer(self):
+        headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
+        url = f'{self.__basePushURL()}/files'
+        return requests.post(url, headers=headers)
+
+    def uploadContentToFileContainer(self, fileContainer: FileContainer, content: BatchUpdateDocuments):
+        headers = fileContainer.requiredHeaders
+        url = fileContainer.uploadUri
+        return requests.put(url, json=asdict(content), headers=headers)
+
+    def pushFileContainerContent(self, sourceId: str, fileContainer: FileContainer):
+        headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
+        url = f'{self.__basePushURL()}/sources/{sourceId}/documents/batch'
+        queryParams = {"fileId": fileContainer.fileId}
+        return requests.put(url=url, params=queryParams, headers=headers)
 
     def __basePushURL(self):
         return f'https://api.cloud.coveo.com/push/v1/organizations/{self.organizationid}'

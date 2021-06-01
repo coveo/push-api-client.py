@@ -1,5 +1,13 @@
-from .platformclient import PlatformClient, SecurityIdentityAliasModel, SecurityIdentityBatchConfig, SecurityIdentityDelete, SecurityIdentityDeleteOptions, SecurityIdentityModel, SourceVisibility
+from .platformclient import BatchUpdateDocuments, FileContainer, PlatformClient, SecurityIdentityAliasModel, SecurityIdentityBatchConfig, SecurityIdentityDelete, SecurityIdentityDeleteOptions, SecurityIdentityModel, SourceVisibility
 from .documentbuilder import DocumentBuilder
+from dataclasses import asdict, dataclass
+import json
+
+
+@dataclass
+class BatchUpdate(BatchUpdateDocuments):
+    addOrUpdate: list[DocumentBuilder]
+
 
 class Source:
     def __init__(self, apikey: str, organizationid: str):
@@ -25,3 +33,20 @@ class Source:
 
     def addOrUpdateDocument(self, sourceId: str, docBuilder: DocumentBuilder):
         return self.client.pushDocument(sourceId, docBuilder.marshal())
+
+    def batchUpdateDocuments(self, sourceId: str, batch: BatchUpdate):
+        resFileContainer = self.client.createFileContainer().json()
+
+        fileContainer = FileContainer(
+            uploadUri=resFileContainer.get('uploadUri'),
+            fileId=resFileContainer.get('fileId'),
+            requiredHeaders=resFileContainer.get('requiredHeaders'))
+
+        batchMarshaled = BatchUpdateDocuments(
+            addOrUpdate=list(
+                map(lambda docBuilder: docBuilder.marshal(), batch.addOrUpdate)),
+            delete=batch.delete)
+
+        self.client.uploadContentToFileContainer(fileContainer, batchMarshaled)
+        
+        return self.client.pushFileContainerContent(sourceId, fileContainer)
