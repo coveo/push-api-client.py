@@ -1,10 +1,6 @@
-"""
-    Dummy conftest.py for push_api_clientpy.
 
-    If you don't know what this is for, just leave it empty.
-    Read more about conftest.py under:
-    - https://docs.pytest.org/en/stable/fixture.html
-    - https://docs.pytest.org/en/stable/writing_plugins.html
-"""
+from push_api_clientpy import DocumentBuilder
+import pytest
 
-# import pytest
+def test_docbuilder():
+    assert DocumentBuilder("https://foo.com", "the_title").marshal().get('uri') == "https://foo.com"

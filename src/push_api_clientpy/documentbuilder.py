@@ -76,8 +76,6 @@ class DocumentBuilder:
 
     def marshal(self):
         self.__validateDataAndBinaryData()
-        # TODO global validation + fill missing
-        # TODO marshal binary data
         if self.document.permanentId == "":
             self.__generatePermanentId()
         return self.__cleanDocument()
