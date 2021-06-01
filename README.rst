@@ -20,7 +20,7 @@ Dev
 * Install dependencies: `pipenv install --dev`
 * Build: `pipenv run tox -e build`
 * Tests: `pipenv run tox`
-* Full list of commands: `pipenv run -av`
+* Full list of commands: `pipenv run tox -av`
 
 
 Note
