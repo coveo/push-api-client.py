@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 "coveo-push-api-client.py" = {editable = true, path = "."}
+requests = "2.25.1"
 
 [dev-packages]
 tox = "*"
