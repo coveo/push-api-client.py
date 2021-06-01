@@ -1,9 +1,12 @@
 
-from src.push_api_clientpy import DocumentBuilder, Source, SecurityIdentityModel, IdentityModel, AliasMapping, SecurityIdentityAliasModel, SecurityIdentityDelete
+from src.push_api_clientpy import DocumentBuilder, Source, SecurityIdentityModel, IdentityModel, AliasMapping, SecurityIdentityAliasModel, SecurityIdentityDelete, UserSecurityIdentityBuilder
 import datetime
 from dotenv import dotenv_values
 
-docBuilder = DocumentBuilder('https://perdu.com', 'title')
+docBuilder = DocumentBuilder('https://perdu.com', 'title')\
+    .withAllowAnonymousUsers(False)\
+    .withAllowedPermissions(UserSecurityIdentityBuilder('olamothe@coveo.com'))\
+    .withDeniedPermissions(UserSecurityIdentityBuilder(['lbompart@coveo.com', 'ylakhdar@coveo.com']))
 
 source = Source(apikey=dotenv_values().get("API_KEY"),
                 organizationid=dotenv_values().get("ORG_ID"))
