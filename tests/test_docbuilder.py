@@ -46,11 +46,11 @@ class TestDocBuilder:
 
     def testMarshalDocumentDateAsNumber(self, docBuilder):
         docBuilder.withDate(1262322000)
-        assert docBuilder.marshal().get("date") == "2010-01-01T00:00:00"
+        assert docBuilder.marshal().get("date") == datetime.fromtimestamp(1262322000).isoformat()
 
     def testMarshalDocumentDateAsDatetime(self, docBuilder):
         docBuilder.withDate(datetime.fromtimestamp(1577854800))
-        assert docBuilder.marshal().get("date") == "2020-01-01T00:00:00"
+        assert docBuilder.marshal().get("date") == datetime.fromtimestamp(1577854800).isoformat()
 
     def testMarshalDocumentModifiedDateAsString(self, docBuilder):
         docBuilder.withModifiedDate("2000/01/01")
@@ -58,11 +58,11 @@ class TestDocBuilder:
 
     def testMarshalDocumentModifiedDateAsNumber(self, docBuilder):
         docBuilder.withModifiedDate(1262322000)
-        assert docBuilder.marshal().get("modifiedDate") == "2010-01-01T00:00:00"
+        assert docBuilder.marshal().get("modifiedDate") == datetime.fromtimestamp(1262322000).isoformat()
 
     def testMarshalDocumentModifiedDateAsDatetime(self, docBuilder):
         docBuilder.withModifiedDate(datetime.fromtimestamp(1577854800))
-        assert docBuilder.marshal().get("modifiedDate") == "2020-01-01T00:00:00"
+        assert docBuilder.marshal().get("modifiedDate") == datetime.fromtimestamp(1577854800).isoformat()
 
     def testMarshalDocumentPermanentId(self, docBuilder):
         docBuilder.withPermanentId("the_id")
