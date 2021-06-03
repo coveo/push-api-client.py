@@ -1,0 +1,27 @@
+name: Build
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install pipenv
+        run: pip install pipenv
+      - name: Install dependencies
+        run: pipenv install --dev
+      - name: Build
+        run: pipenv run tox -e build
+      - name: Test
+        run: pipenv run tox

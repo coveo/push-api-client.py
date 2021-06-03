@@ -12,7 +12,16 @@ Description
 Work in progress
 
 
-.. _pyscaffold-notes:
+Dev
+===
+
+* Requires python 3.9
+* Requires pipenv: `pip install pipenv`
+* Install dependencies: `pipenv install --dev`
+* Build: `pipenv run tox -e build`
+* Tests: `pipenv run tox`
+* Full list of commands: `pipenv run tox -av`
+
 
 Note
 ====
