@@ -9,7 +9,6 @@ name = "pypi"
 [dev-packages]
 tox = "*"
 sphinx = "*"
-requests-mock = "*"
 
 [requires]
 python_version = "3.9"

@@ -131,7 +131,7 @@ class PlatformClient:
     def deleteSecurityIdentity(self, securityProviderId: str,  securityIdentityToDelete: SecurityIdentityDelete):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__baseProviderURL(securityProviderId)}/permissions'
-        return requests.delete(url, json=securityIdentityToDelete.toJSON(), headers=headers)
+        return requests.put(url, json=securityIdentityToDelete.toJSON(), headers=headers)
 
     def deleteOldSecurityIdentities(self, securityProviderId: str, batchDelete: SecurityIdentityDeleteOptions):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
