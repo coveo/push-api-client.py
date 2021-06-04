@@ -1,8 +1,6 @@
 import pytest
 import requests
-from push_api_clientpy import IdentityModel, PlatformClient, SecurityIdentityModel, SecurityIdentityAliasModel, AliasMapping, SecurityIdentityDeleteOptions, SecurityIdentityDelete
-from push_api_clientpy.documentbuilder import DocumentBuilder
-from push_api_clientpy.platformclient import BatchDelete, BatchUpdateDocuments, FileContainer
+from push_api_clientpy import IdentityModel, PlatformClient, SecurityIdentityModel, SecurityIdentityAliasModel, AliasMapping, SecurityIdentityDelete, DocumentBuilder, BatchDelete, BatchUpdateDocuments, FileContainer
 
 
 @pytest.fixture
@@ -152,7 +150,8 @@ class TestPlatformClient:
         assert lastRequestBody.get("delete")[0].get("documentId") == "the_id_to_delete"
 
     def testPushFileContainerContent(self, client, requests_mock, fileContainer):
-        adapter = requests_mock.put(f"https://api.cloud.coveo.com/push/v1/organizations/my_org/sources/my_source/documents/batch?fileId={fileContainer.fileId}")
+        adapter = requests_mock.put(
+            f"https://api.cloud.coveo.com/push/v1/organizations/my_org/sources/my_source/documents/batch?fileId={fileContainer.fileId}")
 
         client.pushFileContainerContent("my_source", fileContainer)
 
