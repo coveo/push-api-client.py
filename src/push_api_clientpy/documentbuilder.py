@@ -52,6 +52,10 @@ class DocumentBuilder:
         self.document.clickableUri = clickURI
         return self
 
+    def withAuthor(self, author: str):
+        self.document.author = author
+        return self
+
     def withMetadataValue(self, key: str, value: MetadataValue):
         self.__validateReservedKeynames(key)
         self.document.metadata[key] = value
