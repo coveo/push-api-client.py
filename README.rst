@@ -14,7 +14,7 @@ Installation
 Usage
 =====
 
-.. code-block::python
+
     from push_api_clientpy import Source, DocumentBuilder
 
     source = Source("my_api_key", "my_org_id")
