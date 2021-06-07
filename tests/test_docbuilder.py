@@ -126,3 +126,7 @@ class TestDocBuilder:
     def testMarshalAllowAnonymousUsersTrue(self, docBuilder):
         docBuilder.withAllowAnonymousUsers(True)
         assert docBuilder.marshal().get("permissions")[0].get("allowAnonymous") == True
+
+    def testMarshalAuthor(self, docBuilder):
+        docBuilder.withAuthor("bob")
+        assert docBuilder.marshal().get("author") == "bob"
