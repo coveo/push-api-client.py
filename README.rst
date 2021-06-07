@@ -6,11 +6,29 @@ coveo-push-api-client.py
 Python Push API Client
 
 
-Description
-===========
+Installation
+============
 
-Work in progress
+`pip install coveo-push-api-client.py`
 
+Usage
+=====
+
+```py
+from push_api_clientpy import Source, DocumentBuilder
+
+source = Source("my_api_key", "my_org_id")
+
+myDocument = DocumentBuilder("https://my.document.uri", "My document title")\
+    .withData("these words will be searchable")
+
+response = source.addOrUpdateDocument("my_source_id", myDocument)
+
+print(f"Document added: {response.json()}")
+
+```
+
+See more examples in the `./samples` folder.
 
 Dev
 ===
@@ -22,6 +40,14 @@ Dev
 * Tests: `pipenv run tox`
 * Full list of commands: `pipenv run tox -av`
 
+Release
+=======
+
+* Tag the commit to release with semver format `v{Major}.{Minor}.{Patch}` eg: `v1.2.5`.
+* Checkout the newly created tag. eg: `git checkout v1.2.5`
+* Run `pipenv run tox -e clean`
+* Run `pipenv run tox -e build`
+* Run `pipenv run tox -e publish`
 
 Note
 ====
