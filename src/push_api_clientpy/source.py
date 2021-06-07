@@ -34,6 +34,9 @@ class Source:
     def addOrUpdateDocument(self, sourceId: str, docBuilder: DocumentBuilder):
         return self.client.pushDocument(sourceId, docBuilder.marshal())
 
+    def deleteDocument(self, sourceId: str, documentId: str):
+        return self.client.deleteDocument(sourceId, documentId)
+
     def batchUpdateDocuments(self, sourceId: str, batch: BatchUpdate):
         resFileContainer = self.client.createFileContainer().json()
 
@@ -48,5 +51,5 @@ class Source:
             delete=batch.delete)
 
         self.client.uploadContentToFileContainer(fileContainer, batchMarshaled)
-        
+
         return self.client.pushFileContainerContent(sourceId, fileContainer)

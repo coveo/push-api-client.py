@@ -157,3 +157,11 @@ class TestPlatformClient:
 
         assertAuthHeader(adapter)
         assertContentTypeHeaders(adapter)
+
+    def testDeleteDocument(self, client, requests_mock, doc):
+        adapter = requests_mock.delete(
+            "https://api.cloud.coveo.com/push/v1/organizations/my_org/sources/my_source/documents?deleteChildren=true&documentId=http%3A%2F%2Ffoo.com")
+        client.deleteDocument("my_source", "http://foo.com", True)
+
+        assertAuthHeader(adapter)
+        assertContentTypeHeaders(adapter)
