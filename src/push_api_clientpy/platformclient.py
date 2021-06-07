@@ -91,10 +91,12 @@ class FileContainer:
     fileId: str
     requiredHeaders: dict[str, str]
 
+
 @dataclass
 class BatchDelete:
     documentId: str
     deleteChildren: bool
+
 
 @dataclass
 class BatchUpdateDocuments:
@@ -152,6 +154,13 @@ class PlatformClient:
         url = f'{self.__basePushURL()}/sources/{sourceId}/documents'
         queryParams = {"documentId": doc["documentId"]}
         return requests.put(url, headers=headers, data=json.dumps(doc), params=queryParams)
+
+    def deleteDocument(self, sourceId: str, documentId: str, deleteChildren: bool):
+        headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
+        url = f'{self.__basePushURL()}/sources/{sourceId}/documents'
+        queryParams = {"deleteChildren": str(
+            deleteChildren).lower(), "documentId": documentId}
+        return requests.delete(url, headers=headers, params=queryParams)
 
     def createFileContainer(self):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
