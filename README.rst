@@ -31,7 +31,7 @@ See more examples in the `./samples` folder.
 Dev
 ===
 
-* Requires python 3.9
+* Requires Python 3.9
 * Requires pipenv: ``pip install pipenv``
 * Install dependencies: ``pipenv install --dev``
 * Build: ``pipenv run tox -e build``
@@ -42,7 +42,7 @@ Release
 =======
 
 * Tag the commit to release with semver format ``v{Major}.{Minor}.{Patch}`` eg: ``v1.2.5``.
-* Checkout the newly created tag. eg: ``git checkout v1.2.5``
+* Checkout the newly created tag, e.g.: ``git checkout v1.2.5``
 * Run ``pipenv run tox -e clean``
 * Run ``pipenv run tox -e build``
 * Run ``pipenv run tox -e publish``

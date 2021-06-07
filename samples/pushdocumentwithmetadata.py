@@ -10,7 +10,7 @@ myDocument = DocumentBuilder("https://my.document.uri", "My document title")\
     .withFileExtension('.html')\
     .withMetadata({
         # A field should be created in the organization and mapped to the source for these to be available on documents
-        # See https: // docs.coveo.com/en/1833
+        # See https://docs.coveo.com/en/1833
         "tags": ['the_first_tag', 'the_second_tag'],
         "version": 1,
         "somekey": "some value",
