@@ -9,7 +9,7 @@ Python Push API Client
 Installation
 ============
 
-`pip install coveo-push-api-client.py`
+``pip install coveo-push-api-client.py``
 
 Usage
 =====
@@ -32,20 +32,20 @@ Dev
 ===
 
 * Requires python 3.9
-* Requires pipenv: `pip install pipenv`
-* Install dependencies: `pipenv install --dev`
-* Build: `pipenv run tox -e build`
-* Tests: `pipenv run tox`
-* Full list of commands: `pipenv run tox -av`
+* Requires pipenv: ``pip install pipenv``
+* Install dependencies: ``pipenv install --dev``
+* Build: ``pipenv run tox -e build``
+* Tests: ``pipenv run tox``
+* Full list of commands: ``pipenv run tox -av``
 
 Release
 =======
 
-* Tag the commit to release with semver format `v{Major}.{Minor}.{Patch}` eg: `v1.2.5`.
-* Checkout the newly created tag. eg: `git checkout v1.2.5`
-* Run `pipenv run tox -e clean`
-* Run `pipenv run tox -e build`
-* Run `pipenv run tox -e publish`
+* Tag the commit to release with semver format ``v{Major}.{Minor}.{Patch}`` eg: ``v1.2.5``.
+* Checkout the newly created tag. eg: ``git checkout v1.2.5``
+* Run ``pipenv run tox -e clean``
+* Run ``pipenv run tox -e build``
+* Run ``pipenv run tox -e publish``
 
 Note
 ====
