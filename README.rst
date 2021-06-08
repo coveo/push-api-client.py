@@ -14,7 +14,7 @@ Installation
 Usage
 =====
 
-See more examples in the `./samples` folder.
+See more examples in the ``./samples`` folder.
 
 .. code-block:: python 
 
