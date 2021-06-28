@@ -1,6 +1,6 @@
 import pytest
 import requests
-from push_api_clientpy import IdentityModel, PlatformClient, SecurityIdentityModel, SecurityIdentityAliasModel, AliasMapping, SecurityIdentityDelete, DocumentBuilder, BatchDelete, BatchUpdateDocuments, FileContainer
+from push_api_clientpy import IdentityModel, PlatformClient, SecurityIdentityModel, SecurityIdentityAliasModel, AliasMapping, SecurityIdentityDelete, DocumentBuilder, BatchDelete, BatchUpdateDocuments, FileContainer, SecurityIdentityBatchConfig
 
 
 @pytest.fixture
@@ -26,6 +26,10 @@ def securityIdentityModelAlias(identityModel):
 @pytest.fixture
 def securityIdentityDelete(identityModel):
     return SecurityIdentityDelete(Identity=identityModel)
+
+@pytest.fixture
+def securityIdentityBatchConfig():
+    return SecurityIdentityBatchConfig(FileID="the_file_id", OrderingID=123)
 
 
 @pytest.fixture
@@ -113,6 +117,14 @@ class TestPlatformClient:
 
         assert lastRequestBody.get("identity").get("name") == "the_name"
 
+        assertAuthHeader(adapter)
+        assertContentTypeHeaders(adapter)
+
+    def testManageSecurityIdentities(self, client, requests_mock, securityIdentityBatchConfig):
+        adapter = requests_mock.put(
+            f"https://api.cloud.coveo.com/push/v1/organizations/my_org/providers/my_provider/permissions/batch?fileId={securityIdentityBatchConfig.FileID}&orderingId={securityIdentityBatchConfig.OrderingID}", json={})
+        client.manageSecurityIdentities(
+            "my_provider", securityIdentityBatchConfig)
         assertAuthHeader(adapter)
         assertContentTypeHeaders(adapter)
 
