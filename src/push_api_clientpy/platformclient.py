@@ -147,7 +147,7 @@ class PlatformClient:
         url = f'{self.__baseProviderURL(securityProviderId)}/permissions/batch'
         queryParams = {"fileId": batchConfig.FileID,
                        "orderingId": batchConfig.OrderingID}
-        return requests.delete(url, params=queryParams, headers=headers)
+        return requests.put(url, params=queryParams, headers=headers)
 
     def pushDocument(self, sourceId: str, doc):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
