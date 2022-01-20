@@ -104,8 +104,11 @@ class DocumentBuilder:
         return withoutEmptyValue
 
     def __generatePermanentId(self):
-        self.document.permanentId = hashlib.sha256(
-            self.document.uri.encode('utf-8')).hexdigest()
+        # generate a 60-character id
+        utf8 = self.document.uri.encode('utf-8')
+        md5 = hashlib.md5(utf8)
+        sha1 = hashlib.sha1(utf8)
+        self.document.permanentId = md5.hexdigest()[:30] + sha1.hexdigest()[:30]
 
     def __validateDateAndReturnValidDate(self, date: Union[str, int, datetime]) -> str:
         dateAsDatetime = datetime.now()
