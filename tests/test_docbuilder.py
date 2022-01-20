@@ -69,8 +69,8 @@ class TestDocBuilder:
         assert docBuilder.marshal().get("permanentId") == "the_id"
 
     def testMarshalDocumentPermanentIdFromURI(self, docBuilder):
-        assert docBuilder.marshal().get("permanentId") == hashlib.sha256(
-            "https://foo.com".encode("utf-8")).hexdigest()
+        # 'https://foo.com'
+        assert docBuilder.marshal().get("permanentId") == 'aa2e0510b66edff7f05e2b30d4f1b3a4b5481c06b69f41751c54675c5afb'
 
     def testMarshalFileExtension(self, docBuilder):
         docBuilder.withFileExtension(".html")
