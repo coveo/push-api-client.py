@@ -6,6 +6,9 @@ import requests
 import json
 
 SourceVisibility = Literal["PRIVATE", "SECURED", "SHARED"]
+DEFAULT_RETRY_AFTER = 5
+DEFAULT_MAX_RETRIES = 50
+DEFAULT_TIME_MULTIPLE = 2
 
 
 @dataclass
@@ -106,9 +109,12 @@ class BatchUpdateDocuments:
 
 
 class PlatformClient:
-    def __init__(self, apikey: str, organizationid: str):
+    def __init__(self, apikey: str, organizationid: str, retry_after = DEFAULT_RETRY_AFTER, max_retries = DEFAULT_MAX_RETRIES, time_mutiple = DEFAULT_TIME_MULTIPLE):
         self.apikey = apikey
         self.organizationid = organizationid
+        self.retry_after = retry_after
+        self.max_retries = max_retries
+        self.time_multiple = time_mutiple
 
     def createSource(self, name: str, sourceVisibility: SourceVisibility):
         data = {
@@ -119,65 +125,65 @@ class PlatformClient:
         }
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = self.__baseSourceURL()
-        return requests.post(url, json=data, headers=headers)
+        return self.call_api_with_retries('post', url, data=data)
 
     def createOrUpdateSecurityIdentity(self, securityProviderId: str, securityIdentityModel: SecurityIdentityModel):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__baseProviderURL(securityProviderId)}/permissions'
-        return requests.put(url, json=securityIdentityModel.toJSON(), headers=headers)
+        return self.call_api_with_retries('put',url, json=securityIdentityModel.toJSON(), headers=headers)
 
     def createOrUpdateSecurityIdentityAlias(self, securityProviderId: str, securityIdentityAlias: SecurityIdentityAliasModel):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__baseProviderURL(securityProviderId)}/mappings'
-        return requests.put(url, json=securityIdentityAlias.toJSON(), headers=headers)
+        return self.call_api_with_retries('put',url, json=securityIdentityAlias.toJSON(), headers=headers)
 
     def deleteSecurityIdentity(self, securityProviderId: str,  securityIdentityToDelete: SecurityIdentityDelete):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__baseProviderURL(securityProviderId)}/permissions'
-        return requests.delete(url, json=securityIdentityToDelete.toJSON(), headers=headers)
+        return self.call_api_with_retries('delete', url, json=securityIdentityToDelete.toJSON(), headers=headers)
 
     def deleteOldSecurityIdentities(self, securityProviderId: str, batchDelete: SecurityIdentityDeleteOptions):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__baseProviderURL(securityProviderId)}/permissions/olderthan'
         queryParams = {"orderingId": batchDelete.OrderingID,
                        "queueDelay": batchDelete.QueueDelay}
-        return requests.delete(url, params=queryParams, headers=headers)
+        return self.call_api_with_retries('delete', url, params=queryParams, headers=headers)
 
     def manageSecurityIdentities(self, securityProviderId: str, batchConfig: SecurityIdentityBatchConfig):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__baseProviderURL(securityProviderId)}/permissions/batch'
         queryParams = {"fileId": batchConfig.FileID,
                        "orderingId": batchConfig.OrderingID}
-        return requests.put(url, params=queryParams, headers=headers)
+        return self.call_api_with_retries('put', url, params=queryParams, headers=headers)
 
     def pushDocument(self, sourceId: str, doc):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__basePushURL()}/sources/{sourceId}/documents'
         queryParams = {"documentId": doc["documentId"]}
-        return requests.put(url, headers=headers, data=json.dumps(doc), params=queryParams)
+        return self.call_api_with_retries('put',url, headers=headers, data=json.dumps(doc), params=queryParams)
 
     def deleteDocument(self, sourceId: str, documentId: str, deleteChildren: bool):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__basePushURL()}/sources/{sourceId}/documents'
         queryParams = {"deleteChildren": str(
             deleteChildren).lower(), "documentId": documentId}
-        return requests.delete(url, headers=headers, params=queryParams)
+        return self.call_api_with_retries('delete',url, headers=headers, params=queryParams)
 
     def createFileContainer(self):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__basePushURL()}/files'
-        return requests.post(url, headers=headers)
+        return self.call_api_with_retries('post', url, headers=headers)
 
     def uploadContentToFileContainer(self, fileContainer: FileContainer, content: BatchUpdateDocuments):
         headers = fileContainer.requiredHeaders
         url = fileContainer.uploadUri
-        return requests.put(url, json=asdict(content), headers=headers)
+        return self.call_api_with_retries('put',url, json=asdict(content), headers=headers)
 
     def pushFileContainerContent(self, sourceId: str, fileContainer: FileContainer):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__basePushURL()}/sources/{sourceId}/documents/batch'
         queryParams = {"fileId": fileContainer.fileId}
-        return requests.put(url=url, params=queryParams, headers=headers)
+        return self.call_api_with_retries('put',url=url, params=queryParams, headers=headers)
 
     def __basePushURL(self):
         return f'https://api.cloud.coveo.com/push/v1/organizations/{self.organizationid}'
@@ -197,14 +203,21 @@ class PlatformClient:
     def __contentTypeApplicationJSONHeader(self):
         return {'Content-Type': 'application/json', 'Accept': 'application/json'}
 
-    def call_api_with_retries(call_endpoint, call_data, max_retries=50, retry_after=5, time_multiple=2):
+    def call_api_with_retries(self,
+                              method: str,
+                              call_endpoint: str,
+                              data: _Data | None = ...,
+                              headers: _HeadersMapping | None = ...,
+                              params: _Params | None = ...,
+                              json: Incomplete | None = ...
+                            ):
         nb_retries = 0
-        delay_in_seconds = retry_after
+        delay_in_seconds = self.retry_after
         while True:
-            response = requests.post(call_endpoint, data=call_data)
-            if response.status_code == 429 and nb_retries < max_retries:
+            response = requests.request(method, call_endpoint, data=data, headers=headers, params=params, json=json)
+            if response.status_code == 429 and nb_retries < self.max_retries:
                 time.sleep(delay_in_seconds)
-                delay_in_seconds = delay_in_seconds * time_multiple
+                delay_in_seconds = delay_in_seconds * self.time_multiple
                 nb_retries += 1
             else:
                 response.raise_for_status()
