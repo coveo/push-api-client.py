@@ -1,6 +1,7 @@
 from .document import Document, SecurityIdentityType
 from dataclasses import asdict, dataclass
 from typing import Literal, TypedDict
+import time
 import requests
 import json
 
@@ -195,3 +196,16 @@ class PlatformClient:
 
     def __contentTypeApplicationJSONHeader(self):
         return {'Content-Type': 'application/json', 'Accept': 'application/json'}
+
+    def call_api_with_retries(call_endpoint, call_data, max_retries=50, retry_after=5, time_multiple=2):
+        nb_retries = 0
+        delay_in_seconds = retry_after
+        while True:
+            response = requests.post(call_endpoint, data=call_data)
+            if response.status_code == 429 and nb_retries < max_retries:
+                time.sleep(delay_in_seconds)
+                delay_in_seconds = delay_in_seconds * time_multiple
+                nb_retries += 1
+            else:
+                response.raise_for_status()
+                return response
