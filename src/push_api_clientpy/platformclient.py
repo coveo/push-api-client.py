@@ -1,6 +1,6 @@
 from .document import Document, SecurityIdentityType
 from dataclasses import asdict, dataclass
-from typing import Literal, TypedDict
+from typing import Literal
 import time
 import requests
 import json
@@ -109,7 +109,7 @@ class BatchUpdateDocuments:
 
 
 class PlatformClient:
-    def __init__(self, apikey: str, organizationid: str, retry_after = DEFAULT_RETRY_AFTER, max_retries = DEFAULT_MAX_RETRIES, time_mutiple = DEFAULT_TIME_MULTIPLE):
+    def __init__(self, apikey: str, organizationid: str, retry_after: int = DEFAULT_RETRY_AFTER, max_retries: int = DEFAULT_MAX_RETRIES, time_mutiple: int = DEFAULT_TIME_MULTIPLE):
         self.apikey = apikey
         self.organizationid = organizationid
         self.retry_after = retry_after
@@ -125,7 +125,7 @@ class PlatformClient:
         }
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = self.__baseSourceURL()
-        return self.call_api_with_retries('post', url, data=data)
+        return self.call_api_with_retries('post', url, json=data, headers=headers)
 
     def createOrUpdateSecurityIdentity(self, securityProviderId: str, securityIdentityModel: SecurityIdentityModel):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
@@ -183,7 +183,7 @@ class PlatformClient:
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__basePushURL()}/sources/{sourceId}/documents/batch'
         queryParams = {"fileId": fileContainer.fileId}
-        return self.call_api_with_retries('put',url=url, params=queryParams, headers=headers)
+        return self.call_api_with_retries('put',url, params=queryParams, headers=headers)
 
     def __basePushURL(self):
         return f'https://api.cloud.coveo.com/push/v1/organizations/{self.organizationid}'
@@ -204,17 +204,17 @@ class PlatformClient:
         return {'Content-Type': 'application/json', 'Accept': 'application/json'}
 
     def call_api_with_retries(self,
-                              method: str,
-                              call_endpoint: str,
-                              data: _Data | None = ...,
-                              headers: _HeadersMapping | None = ...,
-                              params: _Params | None = ...,
-                              json: Incomplete | None = ...
+                              method,
+                              url,
+                              data = None,
+                              headers = None,
+                              params = None,
+                              json = None
                             ):
         nb_retries = 0
         delay_in_seconds = self.retry_after
         while True:
-            response = requests.request(method, call_endpoint, data=data, headers=headers, params=params, json=json)
+            response = requests.request(method, url, data=data, headers=headers, params=params, json=json)
             if response.status_code == 429 and nb_retries < self.max_retries:
                 time.sleep(delay_in_seconds)
                 delay_in_seconds = delay_in_seconds * self.time_multiple
