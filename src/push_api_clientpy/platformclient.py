@@ -1,7 +1,6 @@
 from .document import Document, SecurityIdentityType
 from dataclasses import asdict, dataclass
 from typing import Literal
-import time
 import requests
 from requests.adapters import HTTPAdapter, Retry
 import json
@@ -217,10 +216,10 @@ class PlatformClient:
                               json = None
                             ):
         s = requests.Session()
-        retries = Retry(total=self.backoff_options.max_retries,
+        retries = Retry(status=self.backoff_options.max_retries,
+                        status_forcelist=[429],
                         backoff_factor=self.backoff_options.time_multiple,
-                        raise_on_status=[429],
-                        backoff_jitter=1.0
+                        backoff_jitter=self.backoff_options.retry_after
                         )
         s.mount('http://', HTTPAdapter(max_retries=retries))
         response = s.request(method, url, data=data, headers=headers, params=params, json=json)
