@@ -1,11 +1,11 @@
 import pytest
 import requests
-from push_api_clientpy import IdentityModel, PlatformClient, SecurityIdentityModel, SecurityIdentityAliasModel, AliasMapping, SecurityIdentityDelete, DocumentBuilder, BatchDelete, BatchUpdateDocuments, FileContainer, SecurityIdentityBatchConfig
+from push_api_clientpy import IdentityModel, PlatformClient, SecurityIdentityModel, SecurityIdentityAliasModel, AliasMapping, SecurityIdentityDelete, DocumentBuilder, BatchDelete, BatchUpdateDocuments, FileContainer, SecurityIdentityBatchConfig, BackoffOptions
 
 
 @pytest.fixture
 def client():
-    return PlatformClient("my_key", "my_org")
+    return PlatformClient("my_key", "my_org", BackoffOptions())
 
 
 @pytest.fixture

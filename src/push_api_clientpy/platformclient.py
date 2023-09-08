@@ -3,6 +3,7 @@ from dataclasses import asdict, dataclass
 from typing import Literal
 import time
 import requests
+from requests.adapters import HTTPAdapter, Retry
 import json
 
 SourceVisibility = Literal["PRIVATE", "SECURED", "SHARED"]
@@ -107,14 +108,18 @@ class BatchUpdateDocuments:
     addOrUpdate: list[Document]
     delete: list[BatchDelete]
 
+@dataclass
+class BackoffOptions:
+    retry_after: int = DEFAULT_RETRY_AFTER
+    max_retries: int = DEFAULT_MAX_RETRIES
+    time_multiple: int = DEFAULT_TIME_MULTIPLE
+
 
 class PlatformClient:
-    def __init__(self, apikey: str, organizationid: str, retry_after: int = DEFAULT_RETRY_AFTER, max_retries: int = DEFAULT_MAX_RETRIES, time_mutiple: int = DEFAULT_TIME_MULTIPLE):
+    def __init__(self, apikey: str, organizationid: str, backoff_options: BackoffOptions):
         self.apikey = apikey
         self.organizationid = organizationid
-        self.retry_after = retry_after
-        self.max_retries = max_retries
-        self.time_multiple = time_mutiple
+        self.backoff_options = backoff_options
 
     def createSource(self, name: str, sourceVisibility: SourceVisibility):
         data = {
@@ -211,14 +216,13 @@ class PlatformClient:
                               params = None,
                               json = None
                             ):
-        nb_retries = 0
-        delay_in_seconds = self.retry_after
-        while True:
-            response = requests.request(method, url, data=data, headers=headers, params=params, json=json)
-            if response.status_code == 429 and nb_retries < self.max_retries:
-                time.sleep(delay_in_seconds)
-                delay_in_seconds = delay_in_seconds * self.time_multiple
-                nb_retries += 1
-            else:
-                response.raise_for_status()
-                return response
+        s = requests.Session()
+        retries = Retry(total=self.backoff_options.max_retries,
+                        backoff_factor=self.backoff_options.time_multiple,
+                        raise_on_status=[429],
+                        backoff_jitter=1.0
+                        )
+        s.mount('http://', HTTPAdapter(max_retries=retries))
+        response = s.request(method, url, data=data, headers=headers, params=params, json=json)
+        response.raise_for_status()
+        return response
