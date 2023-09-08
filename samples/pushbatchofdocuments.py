@@ -1,7 +1,7 @@
-from push_api_clientpy import Source, DocumentBuilder, BatchUpdate
+from push_api_clientpy import Source, DocumentBuilder, BatchUpdate, BackoffOptions
 from push_api_clientpy.platformclient import BatchDelete
 
-source = Source("my_api_key", "my_org_id")
+source = Source("my_api_key", "my_org_id", BackoffOptions(3, 10, 3))
 
 
 myBatchOfDocuments = BatchUpdate(addOrUpdate=[], delete=[])
