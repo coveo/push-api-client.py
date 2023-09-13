@@ -1,7 +1,6 @@
 import pytest
 import requests
 import requests_mock
-from requests.adapters import Retry
 from push_api_clientpy import IdentityModel, PlatformClient, SecurityIdentityModel, SecurityIdentityAliasModel, AliasMapping, SecurityIdentityDelete, DocumentBuilder, BatchDelete, BatchUpdateDocuments, FileContainer, SecurityIdentityBatchConfig, BackoffOptions
 
 
@@ -42,15 +41,6 @@ def fileContainer():
 @pytest.fixture
 def doc():
     return DocumentBuilder("http://foo.com", "the_title").marshal()
-
-@pytest.fixture
-def retry():
-    return Retry(status=2,
-                status_forcelist=[429],
-                backoff_factor=1,
-                backoff_jitter=100
-                )
-
 
 def assertAuthHeader(adapter):
     lastRequestHeaders = adapter.last_request.headers
@@ -195,17 +185,3 @@ class TestPlatformClient:
         assert retry.status == 10
         assert retry.backoff_factor == 4
         assert retry.backoff_jitter == 100
-
-    # def testRetryMechanism(self, securityIdentityModel, retry):
-    #     session = requests.Session()
-    #     adapter = requests_mock.Adapter()
-    #     adapter.max_retries=retry
-    #     endpoint = "https://api.cloud.coveo.com/push/v1/organizations/my_org/providers/my_provider/permissions"
-    #     adapter.register_uri('PUT', endpoint, status_code=429)
-    #     session.mount('https://', adapter)
-
-    #     new_client = PlatformClient("my_key", "my_org", BackoffOptions(retry_after=100), session)
-
-    #     response = new_client.createOrUpdateSecurityIdentity("my_provider", securityIdentityModel)
-    #     assert response.status_code == 429
-    #     assert response.history == 2
