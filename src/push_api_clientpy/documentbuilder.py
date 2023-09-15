@@ -25,7 +25,7 @@ class DocumentBuilder:
     def withCompressedBinaryData(self, data: str, compressionType: CompressionType):
         self.document.compressedBinaryData.compressionType = compressionType
         self.document.compressedBinaryData.data = data
-        return self        
+        return self
 
     def withDate(self, date: Union[str, int, datetime]):
         self.document.date = self.__validateDateAndReturnValidDate(date)

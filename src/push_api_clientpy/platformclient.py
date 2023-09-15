@@ -125,7 +125,7 @@ class PlatformClient:
                         backoff_factor=self.backoff_options.time_multiple,
                         backoff_jitter=self.backoff_options.retry_after
                         )
-        session.mount('http://', HTTPAdapter(max_retries=self.retries))
+        session.mount('https://', HTTPAdapter(max_retries=self.retries))
         self.session = session
 
     def createSource(self, name: str, sourceVisibility: SourceVisibility):
