@@ -37,15 +37,15 @@ By default, the SDK leverages an exponential backoff retry mechanism. Exponentia
 
 The exponential backoff parameters are as follows:
 
-* `retryAfter` - The amount of time, in seconds, to wait between throttled request attempts.
+* `retry_after` - The amount of time, in seconds, to wait between throttled request attempts.
 
   Optional, will default to 5.
 
-* `maxRetries` - The maximum number of times to retry throttled requests.
+* `max_retries` - The maximum number of times to retry throttled requests.
 
   Optional, will default to 10.
 
-* `timeMultiple` - The multiple by which to increase the wait time between each throttled request attempt.
+* `time_multiple` - The multiple by which to increase the wait time between each throttled request attempt.
 
   Optional, will default to 2.
 
