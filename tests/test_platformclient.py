@@ -1,6 +1,5 @@
 import pytest
 import requests
-import requests_mock
 from push_api_clientpy import IdentityModel, PlatformClient, SecurityIdentityModel, SecurityIdentityAliasModel, AliasMapping, SecurityIdentityDelete, DocumentBuilder, BatchDelete, BatchUpdateDocuments, FileContainer, SecurityIdentityBatchConfig, BackoffOptions
 
 
