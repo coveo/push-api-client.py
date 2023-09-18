@@ -55,6 +55,7 @@ You may configure the exponential backoff that will be applied to all outgoing r
 
     source = Source("my_api_key", "my_org_id", BackoffOptions(3, 10, 3))
 
+By default, requests will retry a maximum of 10 times, waiting 5 seconds after the first attempt, with a time multiple of 2 (which will equate to a maximum execution time of roughly 1.5 hours).
 
 Dev
 ===
