@@ -1,11 +1,11 @@
 import pytest
 import requests
-from push_api_clientpy import IdentityModel, PlatformClient, SecurityIdentityModel, SecurityIdentityAliasModel, AliasMapping, SecurityIdentityDelete, DocumentBuilder, BatchDelete, BatchUpdateDocuments, FileContainer, SecurityIdentityBatchConfig
+from push_api_clientpy import IdentityModel, PlatformClient, SecurityIdentityModel, SecurityIdentityAliasModel, AliasMapping, SecurityIdentityDelete, DocumentBuilder, BatchDelete, BatchUpdateDocuments, FileContainer, SecurityIdentityBatchConfig, BackoffOptions
 
 
 @pytest.fixture
 def client():
-    return PlatformClient("my_key", "my_org")
+    return PlatformClient("my_key", "my_org", BackoffOptions(retry_after=100))
 
 
 @pytest.fixture
@@ -40,7 +40,6 @@ def fileContainer():
 @pytest.fixture
 def doc():
     return DocumentBuilder("http://foo.com", "the_title").marshal()
-
 
 def assertAuthHeader(adapter):
     lastRequestHeaders = adapter.last_request.headers
@@ -177,3 +176,10 @@ class TestPlatformClient:
 
         assertAuthHeader(adapter)
         assertContentTypeHeaders(adapter)
+
+    def testRetryMechanismOptions(self):
+        new_client = PlatformClient("my_key", "my_org", BackoffOptions(retry_after=100, max_retries=10))
+
+        retry = new_client.retries
+        assert retry.total == 10
+        assert retry.backoff_factor == 100

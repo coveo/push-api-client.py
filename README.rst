@@ -16,10 +16,10 @@ Usage
 
 See more examples in the ``./samples`` folder.
 
-.. code-block:: python 
+.. code-block:: python
 
     from push_api_clientpy import Source, DocumentBuilder
-    
+
     source = Source("my_api_key", "my_org_id")
 
     myDocument = DocumentBuilder("https://my.document.uri", "My document title")\
@@ -29,6 +29,29 @@ See more examples in the ``./samples`` folder.
 
     print(f"Document added: {response.json()}")
 
+
+Exponential backoff retry configuration
+=======================================
+
+By default, the SDK leverages an exponential backoff retry mechanism. Exponential backoff allows for the SDK to make multiple attempts to resolve throttled requests, increasing the amount of time to wait for each subsequent attempt. Outgoing requests will retry when a `429` status code is returned from the platform.
+
+The exponential backoff parameters are as follows:
+
+* `retry_after` - The amount of time, in seconds, to wait between throttled request attempts.
+
+  Optional, will default to 5.
+
+* `max_retries` - The maximum number of times to retry throttled requests.
+
+  Optional, will default to 10.
+
+You may configure the exponential backoff that will be applied to all outgoing requests. To do so, specify a `BackoffOptions` object when creating either a `Source` or `PlatformClient` object:
+
+.. code-block:: python
+
+    source = Source("my_api_key", "my_org_id", BackoffOptions(3, 10))
+
+By default, requests will retry a maximum of 10 times, waiting 10 seconds after the second attempt, with a time multiple of 2 (which will equate to a maximum execution time of roughly 1.5 hours. See `urllib3 Retry documentation <https://urllib3.readthedocs.io/en/2.0.4/reference/urllib3.util.html#urllib3.util.Retry>`_).
 
 Dev
 ===

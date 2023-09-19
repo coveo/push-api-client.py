@@ -1,10 +1,13 @@
 from .document import Document, SecurityIdentityType
 from dataclasses import asdict, dataclass
-from typing import Literal, TypedDict
+from typing import Literal
 import requests
+from requests.adapters import HTTPAdapter, Retry
 import json
 
 SourceVisibility = Literal["PRIVATE", "SECURED", "SHARED"]
+DEFAULT_RETRY_AFTER = 5
+DEFAULT_MAX_RETRIES = 50
 
 
 @dataclass
@@ -103,11 +106,25 @@ class BatchUpdateDocuments:
     addOrUpdate: list[Document]
     delete: list[BatchDelete]
 
+@dataclass
+class BackoffOptions:
+    retry_after: int = DEFAULT_RETRY_AFTER
+    max_retries: int = DEFAULT_MAX_RETRIES
+
 
 class PlatformClient:
-    def __init__(self, apikey: str, organizationid: str):
+    def __init__(self, apikey: str, organizationid: str, backoff_options: BackoffOptions = BackoffOptions(), session = requests.Session()):
         self.apikey = apikey
         self.organizationid = organizationid
+        self.backoff_options = backoff_options
+
+        self.retries = Retry(total=self.backoff_options.max_retries,
+                        backoff_factor=self.backoff_options.retry_after,
+                        status_forcelist=[429],
+                        respect_retry_after_header=False
+                        )
+        session.mount('https://', HTTPAdapter(max_retries=self.retries))
+        self.session = session
 
     def createSource(self, name: str, sourceVisibility: SourceVisibility):
         data = {
@@ -118,65 +135,65 @@ class PlatformClient:
         }
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = self.__baseSourceURL()
-        return requests.post(url, json=data, headers=headers)
+        return self.session.post(url, json=data, headers=headers)
 
     def createOrUpdateSecurityIdentity(self, securityProviderId: str, securityIdentityModel: SecurityIdentityModel):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__baseProviderURL(securityProviderId)}/permissions'
-        return requests.put(url, json=securityIdentityModel.toJSON(), headers=headers)
+        return self.session.put(url, json=securityIdentityModel.toJSON(), headers=headers)
 
     def createOrUpdateSecurityIdentityAlias(self, securityProviderId: str, securityIdentityAlias: SecurityIdentityAliasModel):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__baseProviderURL(securityProviderId)}/mappings'
-        return requests.put(url, json=securityIdentityAlias.toJSON(), headers=headers)
+        return self.session.put(url, json=securityIdentityAlias.toJSON(), headers=headers)
 
     def deleteSecurityIdentity(self, securityProviderId: str,  securityIdentityToDelete: SecurityIdentityDelete):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__baseProviderURL(securityProviderId)}/permissions'
-        return requests.delete(url, json=securityIdentityToDelete.toJSON(), headers=headers)
+        return self.session.delete(url, json=securityIdentityToDelete.toJSON(), headers=headers)
 
     def deleteOldSecurityIdentities(self, securityProviderId: str, batchDelete: SecurityIdentityDeleteOptions):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__baseProviderURL(securityProviderId)}/permissions/olderthan'
         queryParams = {"orderingId": batchDelete.OrderingID,
                        "queueDelay": batchDelete.QueueDelay}
-        return requests.delete(url, params=queryParams, headers=headers)
+        return self.session.delete(url, params=queryParams, headers=headers)
 
     def manageSecurityIdentities(self, securityProviderId: str, batchConfig: SecurityIdentityBatchConfig):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__baseProviderURL(securityProviderId)}/permissions/batch'
         queryParams = {"fileId": batchConfig.FileID,
                        "orderingId": batchConfig.OrderingID}
-        return requests.put(url, params=queryParams, headers=headers)
+        return self.session.put(url, params=queryParams, headers=headers)
 
     def pushDocument(self, sourceId: str, doc):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__basePushURL()}/sources/{sourceId}/documents'
         queryParams = {"documentId": doc["documentId"]}
-        return requests.put(url, headers=headers, data=json.dumps(doc), params=queryParams)
+        return self.session.put(url, headers=headers, data=json.dumps(doc), params=queryParams)
 
     def deleteDocument(self, sourceId: str, documentId: str, deleteChildren: bool):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__basePushURL()}/sources/{sourceId}/documents'
         queryParams = {"deleteChildren": str(
             deleteChildren).lower(), "documentId": documentId}
-        return requests.delete(url, headers=headers, params=queryParams)
+        return self.session.delete(url, headers=headers, params=queryParams)
 
     def createFileContainer(self):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__basePushURL()}/files'
-        return requests.post(url, headers=headers)
+        return self.session.post(url, headers=headers)
 
     def uploadContentToFileContainer(self, fileContainer: FileContainer, content: BatchUpdateDocuments):
         headers = fileContainer.requiredHeaders
         url = fileContainer.uploadUri
-        return requests.put(url, json=asdict(content), headers=headers)
+        return self.session.put(url, json=asdict(content), headers=headers)
 
     def pushFileContainerContent(self, sourceId: str, fileContainer: FileContainer):
         headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__basePushURL()}/sources/{sourceId}/documents/batch'
         queryParams = {"fileId": fileContainer.fileId}
-        return requests.put(url=url, params=queryParams, headers=headers)
+        return self.session.put(url=url, params=queryParams, headers=headers)
 
     def __basePushURL(self):
         return f'https://api.cloud.coveo.com/push/v1/organizations/{self.organizationid}'

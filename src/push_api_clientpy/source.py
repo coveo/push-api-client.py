@@ -1,4 +1,5 @@
-from .platformclient import BatchUpdateDocuments, FileContainer, PlatformClient, SecurityIdentityAliasModel, SecurityIdentityBatchConfig, SecurityIdentityDelete, SecurityIdentityDeleteOptions, SecurityIdentityModel, SourceVisibility
+from .platformclient import BatchUpdateDocuments, FileContainer, PlatformClient, SecurityIdentityAliasModel, SecurityIdentityBatchConfig, SecurityIdentityDelete, SecurityIdentityDeleteOptions, SecurityIdentityModel, SourceVisibility, DEFAULT_MAX_RETRIES, DEFAULT_RETRY_AFTER
+from .platformclient import BackoffOptions
 from .documentbuilder import DocumentBuilder
 from dataclasses import asdict, dataclass
 import json
@@ -10,8 +11,8 @@ class BatchUpdate(BatchUpdateDocuments):
 
 
 class Source:
-    def __init__(self, apikey: str, organizationid: str):
-        self.client = PlatformClient(apikey, organizationid)
+    def __init__(self, apikey: str, organizationid: str, backoff_options: BackoffOptions = BackoffOptions()):
+        self.client = PlatformClient(apikey, organizationid, backoff_options)
 
     def create(self, name: str, visibility: SourceVisibility):
         return self.client.createSource(name, visibility)
