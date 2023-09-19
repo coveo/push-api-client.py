@@ -113,7 +113,7 @@ class BackoffOptions:
 
 
 class PlatformClient:
-    def __init__(self, apikey: str, organizationid: str, backoff_options: BackoffOptions, session = requests.Session()):
+    def __init__(self, apikey: str, organizationid: str, backoff_options: BackoffOptions = BackoffOptions(), session = requests.Session()):
         self.apikey = apikey
         self.organizationid = organizationid
         self.backoff_options = backoff_options
