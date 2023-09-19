@@ -45,17 +45,13 @@ The exponential backoff parameters are as follows:
 
   Optional, will default to 10.
 
-* `time_multiple` - The multiple by which to increase the wait time between each throttled request attempt.
-
-  Optional, will default to 2.
-
 You may configure the exponential backoff that will be applied to all outgoing requests. To do so, specify a `BackoffOptions` object when creating either a `Source` or `PlatformClient` object:
 
 .. code-block:: python
 
-    source = Source("my_api_key", "my_org_id", BackoffOptions(3, 10, 3))
+    source = Source("my_api_key", "my_org_id", BackoffOptions(3, 10))
 
-By default, requests will retry a maximum of 10 times, waiting 5 seconds after the first attempt, with a time multiple of 2 (which will equate to a maximum execution time of roughly 1.5 hours).
+By default, requests will retry a maximum of 10 times, waiting 10 seconds after the second attempt, with a time multiple of 2 (which will equate to a maximum execution time of roughly 1.5 hours. See `urllib3 Retry documentation <https://urllib3.readthedocs.io/en/2.0.4/reference/urllib3.util.html#urllib3.util.Retry>`_).
 
 Dev
 ===

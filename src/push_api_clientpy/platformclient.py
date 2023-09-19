@@ -8,7 +8,6 @@ import json
 SourceVisibility = Literal["PRIVATE", "SECURED", "SHARED"]
 DEFAULT_RETRY_AFTER = 5
 DEFAULT_MAX_RETRIES = 50
-DEFAULT_TIME_MULTIPLE = 2
 
 
 @dataclass
@@ -111,7 +110,6 @@ class BatchUpdateDocuments:
 class BackoffOptions:
     retry_after: int = DEFAULT_RETRY_AFTER
     max_retries: int = DEFAULT_MAX_RETRIES
-    time_multiple: int = DEFAULT_TIME_MULTIPLE
 
 
 class PlatformClient:
@@ -120,10 +118,10 @@ class PlatformClient:
         self.organizationid = organizationid
         self.backoff_options = backoff_options
 
-        self.retries = Retry(status=self.backoff_options.max_retries,
+        self.retries = Retry(total=self.backoff_options.max_retries,
+                        backoff_factor=self.backoff_options.retry_after,
                         status_forcelist=[429],
-                        backoff_factor=self.backoff_options.time_multiple,
-                        backoff_jitter=self.backoff_options.retry_after
+                        respect_retry_after_header=False
                         )
         session.mount('https://', HTTPAdapter(max_retries=self.retries))
         self.session = session

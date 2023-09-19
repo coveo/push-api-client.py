@@ -178,9 +178,8 @@ class TestPlatformClient:
         assertContentTypeHeaders(adapter)
 
     def testRetryMechanismOptions(self):
-        new_client = PlatformClient("my_key", "my_org", BackoffOptions(retry_after=100, max_retries=10, time_multiple=4))
+        new_client = PlatformClient("my_key", "my_org", BackoffOptions(retry_after=100, max_retries=10))
 
         retry = new_client.retries
         assert retry.status == 10
-        assert retry.backoff_factor == 4
-        assert retry.backoff_jitter == 100
+        assert retry.backoff_factor == 100
