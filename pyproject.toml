@@ -6,3 +6,13 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 # See configuration details in https://github.com/pypa/setuptools_scm
 version_scheme = "no-guess-dev"
+
+[project]
+name = "coveo-push-api-client.py"
+version = "1.1.1"
+description = "Python Push API Client"
+readme = "README.rst"
+requires-python = ">=3.9"
+
+[project.urls]
+"Homepage" = "https://github.com/coveo/push-api-client.py"

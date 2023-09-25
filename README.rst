@@ -37,11 +37,11 @@ By default, the SDK leverages an exponential backoff retry mechanism. Exponentia
 
 The exponential backoff parameters are as follows:
 
-* `retry_after` - The amount of time, in seconds, to wait between throttled request attempts.
+* ``retry_after`` - The amount of time, in seconds, to wait between throttled request attempts.
 
   Optional, will default to 5.
 
-* `max_retries` - The maximum number of times to retry throttled requests.
+* ``max_retries`` - The maximum number of times to retry throttled requests.
 
   Optional, will default to 10.
 
@@ -66,14 +66,28 @@ Dev
 Release
 =======
 
-* Tag the commit to release with semver format ``v{Major}.{Minor}.{Patch}`` eg: ``v1.2.5``.
-* Checkout the newly created tag, e.g.: ``git checkout v1.2.5``
+After merging into master the feature branch for which you would like to publish:
+
+* Checkout the latest version of master on local
+* Open ``pyproject.toml`` in the text editor of your choice
+* Under ``[project]``, update the ``version``, following semantic versioning format (``v{Major}.{Minor}.{Patch}``)
 * Run ``pipenv run tox -e clean``
 * Run ``pipenv run tox -e build``
-* Run ``pipenv run tox -e publish``
+
+You should now see that that the ``dist`` directory has been populated with a ``.whl`` and ``.tar.gz`` file with the correct version in the filenames. These are the distribution archives.
+
+Once the distribution archives are ready:
+
+* Run ``pipenv run tox -e publish -- --repository pypi`` from the root directory
+* When prompted for a username, enter ``__token__``
+* When prompted for a password, enter the PyPI publishing API key, including the ``pypi-`` prefix
+
+After the command finishes running with a successful exit message, confirm that the published version is `live on PyPI <https://pypi.org/project/coveo-push-api-client.py/>`_.
 
 Note
 ====
 
 This project has been set up using PyScaffold 4.0.1. For details and usage
 information on PyScaffold see https://pyscaffold.org/.
+
+For more information on the release process, refer to the `PyPi <https://packaging.python.org/en/latest/tutorials/packaging-projects/>`_ and `PyScaffold <https://pyscaffold.org/en/stable/features.html#uploading-to-pypi>`_ documentation.
