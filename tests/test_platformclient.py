@@ -1,3 +1,4 @@
+import importlib.metadata
 import pytest
 import requests
 from push_api_clientpy import IdentityModel, PlatformClient, SecurityIdentityModel, SecurityIdentityAliasModel, AliasMapping, SecurityIdentityDelete, DocumentBuilder, BatchDelete, BatchUpdateDocuments, FileContainer, SecurityIdentityBatchConfig, BackoffOptions
@@ -51,6 +52,11 @@ def assertContentTypeHeaders(adapter):
     assert lastRequestHeaders.get("Content-Type") == "application/json"
     assert lastRequestHeaders.get("Accept") == "application/json"
 
+def assertUserAgentHeaders(adapter):
+    lastRequestHeaders = adapter.last_request.headers
+    version = importlib.metadata.version('coveo-push-api-client.py')
+    assert lastRequestHeaders.get("User-Agent") == f'CoveoPythonSDK/{version}'
+
 
 class TestPlatformClient:
 
@@ -67,6 +73,7 @@ class TestPlatformClient:
 
         assertAuthHeader(adapter)
         assertContentTypeHeaders(adapter)
+        assertUserAgentHeaders(adapter)
 
     def testCreateOrUpdateSecurityIdentity(self, client, requests_mock, securityIdentityModel):
         adapter = requests_mock.put(
@@ -86,6 +93,7 @@ class TestPlatformClient:
 
         assertAuthHeader(adapter)
         assertContentTypeHeaders(adapter)
+        assertUserAgentHeaders(adapter)
 
     def testCreateOrUpdateSecurityIdentityAlias(self, client, requests_mock, securityIdentityModelAlias):
         adapter = requests_mock.put(
@@ -106,6 +114,7 @@ class TestPlatformClient:
 
         assertAuthHeader(adapter)
         assertContentTypeHeaders(adapter)
+        assertUserAgentHeaders(adapter)
 
     def testDeleteSecurityIdentity(self, client, requests_mock, securityIdentityDelete):
         adapter = requests_mock.delete(
@@ -118,6 +127,7 @@ class TestPlatformClient:
 
         assertAuthHeader(adapter)
         assertContentTypeHeaders(adapter)
+        assertUserAgentHeaders(adapter)
 
     def testManageSecurityIdentities(self, client, requests_mock, securityIdentityBatchConfig):
         adapter = requests_mock.put(
@@ -126,6 +136,7 @@ class TestPlatformClient:
             "my_provider", securityIdentityBatchConfig)
         assertAuthHeader(adapter)
         assertContentTypeHeaders(adapter)
+        assertUserAgentHeaders(adapter)
 
     def testPushDocument(self, client, requests_mock, doc):
         adapter = requests_mock.put(
@@ -138,6 +149,7 @@ class TestPlatformClient:
 
         assertAuthHeader(adapter)
         assertContentTypeHeaders(adapter)
+        assertUserAgentHeaders(adapter)
 
     def testCreateFileContainer(self, client, requests_mock):
         adapter = requests_mock.post(
@@ -146,6 +158,7 @@ class TestPlatformClient:
 
         assertAuthHeader(adapter)
         assertContentTypeHeaders(adapter)
+        assertUserAgentHeaders(adapter)
 
     def testUploadContentToFileContainer(self, client, requests_mock, fileContainer, doc):
         adapter = requests_mock.put(fileContainer.uploadUri)
@@ -168,6 +181,7 @@ class TestPlatformClient:
 
         assertAuthHeader(adapter)
         assertContentTypeHeaders(adapter)
+        assertUserAgentHeaders(adapter)
 
     def testDeleteDocument(self, client, requests_mock):
         adapter = requests_mock.delete(
@@ -176,6 +190,7 @@ class TestPlatformClient:
 
         assertAuthHeader(adapter)
         assertContentTypeHeaders(adapter)
+        assertUserAgentHeaders(adapter)
 
     def testRetryMechanismOptions(self):
         new_client = PlatformClient("my_key", "my_org", BackoffOptions(retry_after=100, max_retries=10))

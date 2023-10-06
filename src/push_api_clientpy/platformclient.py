@@ -4,6 +4,7 @@ from typing import Literal
 import requests
 from requests.adapters import HTTPAdapter, Retry
 import json
+import importlib.metadata
 
 SourceVisibility = Literal["PRIVATE", "SECURED", "SHARED"]
 DEFAULT_RETRY_AFTER = 5
@@ -133,67 +134,56 @@ class PlatformClient:
             "name": name,
             "sourceVisibility": sourceVisibility
         }
-        headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = self.__baseSourceURL()
-        return self.session.post(url, json=data, headers=headers)
+        return self.session.post(url, json=data, headers=self.__headers())
 
     def createOrUpdateSecurityIdentity(self, securityProviderId: str, securityIdentityModel: SecurityIdentityModel):
-        headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__baseProviderURL(securityProviderId)}/permissions'
-        return self.session.put(url, json=securityIdentityModel.toJSON(), headers=headers)
+        return self.session.put(url, json=securityIdentityModel.toJSON(), headers=self.__headers())
 
     def createOrUpdateSecurityIdentityAlias(self, securityProviderId: str, securityIdentityAlias: SecurityIdentityAliasModel):
-        headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__baseProviderURL(securityProviderId)}/mappings'
-        return self.session.put(url, json=securityIdentityAlias.toJSON(), headers=headers)
+        return self.session.put(url, json=securityIdentityAlias.toJSON(), headers=self.__headers())
 
     def deleteSecurityIdentity(self, securityProviderId: str,  securityIdentityToDelete: SecurityIdentityDelete):
-        headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__baseProviderURL(securityProviderId)}/permissions'
-        return self.session.delete(url, json=securityIdentityToDelete.toJSON(), headers=headers)
+        return self.session.delete(url, json=securityIdentityToDelete.toJSON(), headers=self.__headers())
 
     def deleteOldSecurityIdentities(self, securityProviderId: str, batchDelete: SecurityIdentityDeleteOptions):
-        headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__baseProviderURL(securityProviderId)}/permissions/olderthan'
         queryParams = {"orderingId": batchDelete.OrderingID,
                        "queueDelay": batchDelete.QueueDelay}
-        return self.session.delete(url, params=queryParams, headers=headers)
+        return self.session.delete(url, params=queryParams, headers=self.__headers())
 
     def manageSecurityIdentities(self, securityProviderId: str, batchConfig: SecurityIdentityBatchConfig):
-        headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__baseProviderURL(securityProviderId)}/permissions/batch'
         queryParams = {"fileId": batchConfig.FileID,
                        "orderingId": batchConfig.OrderingID}
-        return self.session.put(url, params=queryParams, headers=headers)
+        return self.session.put(url, params=queryParams, headers=self.__headers())
 
     def pushDocument(self, sourceId: str, doc):
-        headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__basePushURL()}/sources/{sourceId}/documents'
         queryParams = {"documentId": doc["documentId"]}
-        return self.session.put(url, headers=headers, data=json.dumps(doc), params=queryParams)
+        return self.session.put(url, headers=self.__headers(), data=json.dumps(doc), params=queryParams)
 
     def deleteDocument(self, sourceId: str, documentId: str, deleteChildren: bool):
-        headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__basePushURL()}/sources/{sourceId}/documents'
         queryParams = {"deleteChildren": str(
             deleteChildren).lower(), "documentId": documentId}
-        return self.session.delete(url, headers=headers, params=queryParams)
+        return self.session.delete(url, headers=self.__headers(), params=queryParams)
 
     def createFileContainer(self):
-        headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__basePushURL()}/files'
-        return self.session.post(url, headers=headers)
+        return self.session.post(url, headers=self.__headers())
 
     def uploadContentToFileContainer(self, fileContainer: FileContainer, content: BatchUpdateDocuments):
-        headers = fileContainer.requiredHeaders
         url = fileContainer.uploadUri
-        return self.session.put(url, json=asdict(content), headers=headers)
+        return self.session.put(url, json=asdict(content), headers=fileContainer.requiredHeaders)
 
     def pushFileContainerContent(self, sourceId: str, fileContainer: FileContainer):
-        headers = self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader()
         url = f'{self.__basePushURL()}/sources/{sourceId}/documents/batch'
         queryParams = {"fileId": fileContainer.fileId}
-        return self.session.put(url=url, params=queryParams, headers=headers)
+        return self.session.put(url=url, params=queryParams, headers=self.__headers())
 
     def __basePushURL(self):
         return f'https://api.cloud.coveo.com/push/v1/organizations/{self.organizationid}'
@@ -207,8 +197,15 @@ class PlatformClient:
     def __baseProviderURL(self, providerId: str):
         return f'{self.__basePushURL()}/providers/{providerId}'
 
+    def __headers(self):
+        return self.__authorizationHeader() | self.__contentTypeApplicationJSONHeader() | self.__userAgentHeader()
+
     def __authorizationHeader(self):
         return {"Authorization": f'Bearer {self.apikey}'}
 
     def __contentTypeApplicationJSONHeader(self):
         return {'Content-Type': 'application/json', 'Accept': 'application/json'}
+
+    def __userAgentHeader(self):
+        version = importlib.metadata.version('coveo-push-api-client.py')
+        return {'User-Agent': f'CoveoPythonSDK/{version}'}
