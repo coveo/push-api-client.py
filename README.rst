@@ -63,14 +63,17 @@ Dev
 * Tests: ``pipenv run tox``
 * Full list of commands: ``pipenv run tox -av``
 
-Release
-=======
+Versioning and Publishing to PyPI
+=================================
 
-After merging into master the feature branch for which you would like to publish:
+Before merging a feature branch into master, you must update the package version of your branch:
 
-* Checkout the latest version of master on local
 * Open ``pyproject.toml`` in the text editor of your choice
 * Under ``[project]``, update the ``version``, following semantic versioning format (``v{Major}.{Minor}.{Patch}``)
+
+Once the feature branch you would like to publish has been merged into master:
+
+* Checkout the latest version of master on local
 * Run ``pipenv run tox -e clean``
 * Run ``pipenv run tox -e build``
 
