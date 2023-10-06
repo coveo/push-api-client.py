@@ -126,6 +126,7 @@ class PlatformClient:
                         )
         session.mount('https://', HTTPAdapter(max_retries=self.retries))
         self.session = session
+        self.version = importlib.metadata.version('coveo-push-api-client.py')
 
     def createSource(self, name: str, sourceVisibility: SourceVisibility):
         data = {
@@ -207,5 +208,4 @@ class PlatformClient:
         return {'Content-Type': 'application/json', 'Accept': 'application/json'}
 
     def __userAgentHeader(self):
-        version = importlib.metadata.version('coveo-push-api-client.py')
-        return {'User-Agent': f'CoveoPythonSDK/{version}'}
+        return {'User-Agent': f'CoveoPythonSDK/{self.version}'}
