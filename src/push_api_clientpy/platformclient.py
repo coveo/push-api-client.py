@@ -208,4 +208,4 @@ class PlatformClient:
         return {'Content-Type': 'application/json', 'Accept': 'application/json'}
 
     def __userAgentHeader(self):
-        return {'User-Agent': f'CoveoPythonSDK/{self.version}'}
+        return {'User-Agent': f'CoveoSDKPython/{self.version}'}
