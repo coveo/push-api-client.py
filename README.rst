@@ -63,6 +63,13 @@ Dev
 * Tests: ``pipenv run tox``
 * Full list of commands: ``pipenv run tox -av``
 
+Different endpoints
+===================
+When your default region is not ``us``, you must set your own endpoint.
+* Use ``setBasePushURL``. For example: ``https://api-eu.cloud.coveo.com``.
+* Use ``setBasePlatformURL``. For example: ``https://platform-eu.cloud.coveo.com``.
+
+
 Versioning and Publishing to PyPI
 =================================
 

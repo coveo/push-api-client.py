@@ -116,6 +116,8 @@ class BackoffOptions:
 class PlatformClient:
     def __init__(self, apikey: str, organizationid: str, backoff_options: BackoffOptions = BackoffOptions(), session = requests.Session()):
         self.apikey = apikey
+        self.basePushURL = ''
+        self.basePlatformURL = ''
         self.organizationid = organizationid
         self.backoff_options = backoff_options
 
@@ -127,6 +129,7 @@ class PlatformClient:
         session.mount('https://', HTTPAdapter(max_retries=self.retries))
         self.session = session
         self.version = importlib.metadata.version('coveo-push-api-client.py')
+
 
     def createSource(self, name: str, sourceVisibility: SourceVisibility):
         data = {
@@ -186,11 +189,22 @@ class PlatformClient:
         queryParams = {"fileId": fileContainer.fileId}
         return self.session.put(url=url, params=queryParams, headers=self.__headers())
 
+    def setBasePushURL(self, url:str):
+        self.basePushURL = url
+    def setBasePlatformURL(self, url:str):
+        self.basePlatformURL = url
+
     def __basePushURL(self):
-        return f'https://api.cloud.coveo.com/push/v1/organizations/{self.organizationid}'
+        if self.basePushURL:
+            return f'{self.basePushURL}/push/v1/organizations/{self.organizationid}'
+        else:
+          return f'https://api.cloud.coveo.com/push/v1/organizations/{self.organizationid}'
 
     def __basePlatformURL(self):
-        return f'https://platform.cloud.coveo.com/rest/organizations/{self.organizationid}'
+        if self.basePlatformURL:
+            return f'{self.basePlatformURL}/rest/organizations/{self.organizationid}'
+        else:
+          return f'https://platform.cloud.coveo.com/rest/organizations/{self.organizationid}'
 
     def __baseSourceURL(self):
         return f'{self.__basePlatformURL()}/sources'
