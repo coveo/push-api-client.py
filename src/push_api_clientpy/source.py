@@ -11,8 +11,15 @@ class BatchUpdate(BatchUpdateDocuments):
 
 
 class Source:
-    def __init__(self, apikey: str, organizationid: str, backoff_options: BackoffOptions = BackoffOptions()):
-        self.client = PlatformClient(apikey, organizationid, backoff_options)
+    def __init__(self, apikey: str,
+                 organizationid: str,
+                 backoff_options: BackoffOptions = BackoffOptions(),
+                 platform_push_api_domain: str = 'api.cloud.coveo.com',
+                 platform_rest_api_domain: str = 'platform.cloud.coveo.com'):
+        self.client = PlatformClient(apikey, organizationid,
+                                     backoff_options = backoff_options,
+                                     platform_push_api_domain = platform_push_api_domain,
+                                     platform_rest_api_domain = platform_rest_api_domain)
 
     def create(self, name: str, visibility: SourceVisibility):
         return self.client.createSource(name, visibility)

@@ -114,11 +114,16 @@ class BackoffOptions:
 
 
 class PlatformClient:
-    def __init__(self, apikey: str, organizationid: str, backoff_options: BackoffOptions = BackoffOptions(), session = requests.Session()):
+    def __init__(self, apikey: str, organizationid: str,
+                 backoff_options: BackoffOptions = BackoffOptions(),
+                 session = requests.Session(),
+                 platform_push_api_domain: str = 'api.cloud.coveo.com',
+                 platform_rest_api_domain: str = 'platform.cloud.coveo.com'):
         self.apikey = apikey
         self.organizationid = organizationid
         self.backoff_options = backoff_options
-
+        self.platform_push_api_domain = platform_push_api_domain
+        self.platform_rest_api_domain = platform_rest_api_domain
         self.retries = Retry(total=self.backoff_options.max_retries,
                         backoff_factor=self.backoff_options.retry_after,
                         status_forcelist=[429],
@@ -187,10 +192,10 @@ class PlatformClient:
         return self.session.put(url=url, params=queryParams, headers=self.__headers())
 
     def __basePushURL(self):
-        return f'https://api.cloud.coveo.com/push/v1/organizations/{self.organizationid}'
+        return f'https://{self.platform_push_api_domain}/push/v1/organizations/{self.organizationid}'
 
     def __basePlatformURL(self):
-        return f'https://platform.cloud.coveo.com/rest/organizations/{self.organizationid}'
+        return f'https://{self.platform_rest_api_domain}/rest/organizations/{self.organizationid}'
 
     def __baseSourceURL(self):
         return f'{self.__basePlatformURL()}/sources'
