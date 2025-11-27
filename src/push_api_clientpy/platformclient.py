@@ -188,10 +188,17 @@ class PlatformClient:
         return self.session.put(url=url, params=queryParams, headers=self.__headers())
 
     def __basePushURL(self):
-        return f'https://api-{self.region}.cloud.coveo.com/push/v1/organizations/{self.organizationid}'
+        if self.region == "us":
+            return f'https://api.cloud.coveo.com/push/v1/organizations/{self.organizationid}'
+        else:
+            return f'https://api-{self.region}.cloud.coveo.com/push/v1/organizations/{self.organizationid}'
+           
 
     def __basePlatformURL(self):
-        return f'https://platform-{self.region}.cloud.coveo.com/rest/organizations/{self.organizationid}'
+        if self.region == "us":
+            return f'https://platform.cloud.coveo.com/rest/organizations/{self.organizationid}'
+        else:
+            return f'https://platform-{self.region}.cloud.coveo.com/rest/organizations/{self.organizationid}'
 
     def __baseSourceURL(self):
         return f'{self.__basePlatformURL()}/sources'
