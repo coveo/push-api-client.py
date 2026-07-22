@@ -126,7 +126,17 @@ class PlatformClient:
                         )
         session.mount('https://', HTTPAdapter(max_retries=self.retries))
         self.session = session
-        self.version = importlib.metadata.version('coveo-push-api-client.py')
+        self.version = self.__resolve_version()
+
+    @staticmethod
+    def __resolve_version() -> str:
+        names = ['coveo-push-api-client.py', 'coveo-push-api-client-py', 'coveo_push_api_client_py']
+        for name in names:
+            try:
+                return importlib.metadata.version(name)
+            except importlib.metadata.PackageNotFoundError:
+                continue
+        return 'unknown'
 
     def createSource(self, name: str, sourceVisibility: SourceVisibility):
         data = {
