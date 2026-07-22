@@ -7,7 +7,8 @@ name = "pypi"
 "coveo-push-api-client.py" = {editable = true, path = "."}
 
 [dev-packages]
-tox = "*"
+tox = ">=4.0,<5"
+virtualenv = ">=20.25,<21"
 sphinx = "*"
 requests-mock = "*"
 
