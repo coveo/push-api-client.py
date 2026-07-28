@@ -8,7 +8,7 @@ name = "pypi"
 
 [dev-packages]
 tox = ">=4.0,<5"
-virtualenv = ">=20.25,<21"
+virtualenv = ">=21.7,<22"
 sphinx = "*"
 requests-mock = "*"
 
