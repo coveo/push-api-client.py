@@ -11,8 +11,8 @@ class BatchUpdate(BatchUpdateDocuments):
 
 
 class Source:
-    def __init__(self, apikey: str, organizationid: str, backoff_options: BackoffOptions = BackoffOptions()):
-        self.client = PlatformClient(apikey, organizationid, backoff_options)
+    def __init__(self, apikey: str, organizationid: str, backoff_options: BackoffOptions = BackoffOptions(), region = 'us'):
+        self.client = PlatformClient(apikey, organizationid, backoff_options, region)
 
     def create(self, name: str, visibility: SourceVisibility):
         return self.client.createSource(name, visibility)
